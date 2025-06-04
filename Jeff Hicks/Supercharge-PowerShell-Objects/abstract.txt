@@ -1,0 +1,5 @@
+Supercharging Objects in the Pipeline
+
+We all know that PowerShell is all about the objects. Whether you are working with files in the console or generating custom output in a module function, you are working with objects.  But are you taking full advantage of this concept? Is the output of your command as elegant and useful as it could be? What would make you more efficient with existing commands?  Fortunately, PowerShell has the tools to make the most of objects in the pipeline, although many people do not take advantage of them. In this demo-heavy session, we'll look at tools and techniques for extending and formatting objects to maximize their usefulness and see how to incorporate them into your projects.
+
+*Learn how to get the most value from objects in the PowerShell pipeline*

@@ -1,0 +1,178 @@
+<!--
+Format type data generated 03/04/2025 14:55:16 by PROSPERO\Jeff
+
+This file was created using the New-PSFormatXML command that is part
+of the PSScriptTools module.
+
+https://github.com/jdhitsolutions/PSScriptTools
+-->
+<Configuration>
+  <ViewDefinitions>
+    <View>
+      <!--Created 03/04/2025 14:55:16 by PROSPERO\Jeff-->
+      <Name>default</Name>
+      <ViewSelectedBy>
+        <TypeName>PSServerDetail</TypeName>
+      </ViewSelectedBy>
+      <GroupBy>
+        <ScriptBlock>
+          <!--Display domain controllers with a different color-->
+            if ($_.Computername -Match "dom") {
+              $fg = "`e[1;38;5;48m"
+            }
+            else {
+              $fg = "`e[1;38;5;147m"
+            }
+            "$fg{0}`e[0m [`e[3m{1}`e[0m]" -f $_.ComputerName,$_.OS.replace("Evaluation","")
+            </ScriptBlock>
+        <Label>Server</Label>
+      </GroupBy>
+      <TableControl>
+        <!--Delete the AutoSize node if you want to use the defined widths.-->
+        <AutoSize />
+        <TableHeaders>
+          <TableColumnHeader>
+            <Label>LastBoot</Label>
+            <Width>23</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Uptime</Label>
+            <Width>21</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>MemGB</Label>
+            <Width>15</Width>
+            <Alignment>right</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Processes</Label>
+            <Width>15</Width>
+            <Alignment>right</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Services</Label>
+            <Width>15</Width>
+            <Alignment>right</Alignment>
+          </TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem>
+                <PropertyName>LastBoot</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>"{0:dd\.hh\:mm\:ss}" -f $_.Uptime</ScriptBlock>
+              </TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>$_.Memory/1mb -as [int]</ScriptBlock>
+              </TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>$_.RunningProcesses</ScriptBlock>
+              </TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>$_.RunningServices</ScriptBlock>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+    <View>
+      <!--Created 03/04/2025 15:16:21 by PROSPERO\Jeff-->
+      <Name>default</Name>
+      <ViewSelectedBy>
+        <TypeName>PSServerDetail</TypeName>
+      </ViewSelectedBy>
+      <ListControl>
+        <ListEntries>
+          <ListEntry>
+            <ListItems>
+              <ListItem>
+                <Label>Computername</Label>
+                <PropertyName>Computername</PropertyName>
+              </ListItem>
+              <ListItem>
+                <Label>OS</Label>
+                <PropertyName>OS</PropertyName>
+              </ListItem>
+              <ListItem>
+                <Label>MemoryGB</Label>
+                <ScriptBlock>$_.Memory/1mb -as [int]</ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>Processes</Label>
+                <PropertyName>RunningProcesses</PropertyName>
+              </ListItem>
+              <ListItem>
+                <Label>Services</Label>
+                <PropertyName>RunningServices</PropertyName>
+              </ListItem>
+              <ListItem>
+                <Label>LastBoot</Label>
+                <PropertyName>LastBoot</PropertyName>
+              </ListItem>
+              <ListItem>
+                <Label>Uptime</Label>
+                <ScriptBlock>"{0:dd\.hh\:mm\:ss}" -f $_.Uptime</ScriptBlock>
+              </ListItem>
+            </ListItems>
+          </ListEntry>
+        </ListEntries>
+      </ListControl>
+    </View>
+    <View>
+      <!--Created 03/04/2025 15:26:02 by PROSPERO\Jeff-->
+      <Name>memory</Name>
+      <ViewSelectedBy>
+        <TypeName>PSServerDetail</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <!--Delete the AutoSize node if you want to use the defined widths.-->
+        <AutoSize />
+        <TableHeaders>
+          <TableColumnHeader>
+            <Label>Computername</Label>
+            <Width>15</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>MemGB</Label>
+            <Width>15</Width>
+            <Alignment>right</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>FreeMemGB</Label>
+            <Width>15</Width>
+            <Alignment>right</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>PctFreeMem</Label>
+            <Width>15</Width>
+            <Alignment>right</Alignment>
+          </TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem>
+                <PropertyName>Computername</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>$_.Memory/1mb -as [int]</ScriptBlock>
+              </TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>$_.FreeMemory/1mb -as [int]</ScriptBlock>
+              </TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>[math]::Round(($_.FreeMemory/$_.Memory)*100,2)</ScriptBlock>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+  </ViewDefinitions>
+</Configuration>

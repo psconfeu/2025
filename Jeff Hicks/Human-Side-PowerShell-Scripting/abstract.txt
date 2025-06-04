@@ -1,0 +1,5 @@
+The Human Side of PowerShell Scripting
+
+In today's workplace, it is not especially difficult to build a PowerShell tool to manage some part of your environment. With the advent of tools like ChatGPT and Copilot, you can even have the work done for you. However, a functioning tool is only part of the story. Is your tool compatible with your environment? Will it meet the needs of its user? What role will the tool play in the PowerShell pipeline?  What do you need to consider in your tool design that will make your command easy to use and provide maximum benefit? In this session, you will learn about the human-side of PowerShell scripting as we explore how you should approach building a PowerShell tool with people in mind. Writing the code to achieve the task is relatively easy, but what do you need to know and consider to take your scripting projects to the next level?
+
+*There is more to a good PowerShell script or function than the mechanics of your code; how you structure your code is just as important as what is in it.*
