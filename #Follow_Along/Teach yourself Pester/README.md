@@ -11,4 +11,7 @@ This practical lesson will arm you with knowledge that is easy to translate to r
 ## Prerequisites
 
 - Basic knowledge of PowerShell
-- TBC...
+- PowerShell 7
+- Pester 6-alpha: Install-Module Pester -MinimumVersion 6.0.0-alpha -AllowPreRelease -Force
+- git
+- Code editor you like, we suggest VSCode + PowerShell extension
