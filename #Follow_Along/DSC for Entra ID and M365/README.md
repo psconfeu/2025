@@ -17,5 +17,7 @@ We'll start with exporting the running configuration, which is usually the first
 In this session you will discover how to use tools such as Azure DevOps release pipelines, DSC and Microsoft365DSC, Pester, PSScriptAnalyzer, to build your M365 and Azure management solution.
 
 ## Prerequisites
-- Basic knowledge of PowerShell
-- ... 
+- Basic knowledge of PowerShell.
+- You need a Windows machine to compile the DSC configuration.
+- Clone the repo to your machine: https://github.com/raandree/Microsoft365DscWorkshop.git.
+- Run the build script `.\build.ps1 -ResolveDependency -UseModuleFast`.
