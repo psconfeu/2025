@@ -1,0 +1,330 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"name":"csharp"},{"name":"fsharp","languageName":"F#","aliases":["f#","fs"]},{"name":"html","languageName":"HTML"},{"name":"http","languageName":"HTTP"},{"name":"javascript","languageName":"JavaScript","aliases":["js"]},{"name":"mermaid","languageName":"Mermaid"},{"name":"pwsh","languageName":"PowerShell","aliases":["powershell"]},{"name":"value"}]}}
+
+#!markdown
+
+# Azure Deployment Environments (ADE)
+
+## Overview
+
+Azure Deployment Environments (ADE) is a cloud-native service that enables development teams to quickly and securely create on-demand, pre-configured environments for developing, testing, and demonstrating applications. ADE provides self-service environment provisioning while maintaining enterprise governance, security, and cost controls.
+
+### What is Azure Deployment Environments?
+
+ADE is a platform service that allows developers to:
+
+- **Self-Service Environment Creation**: Deploy complex, multi-resource environments through a simple interface
+- **Template-Based Provisioning**: Use Infrastructure as Code (IaC) templates to ensure consistency
+- **Governance and Control**: Maintain enterprise policies and cost management
+- **Rapid Iteration**: Create, modify, and destroy environments quickly for experimentation
+
+### Key Capabilities
+
+**🚀 Self-Service Provisioning**
+- Developers can create environments without waiting for IT approval
+- Simple web interface for environment management
+- Integration with familiar development tools and workflows
+
+**📋 Template-Based Infrastructure**
+- ARM templates, Bicep, and Terraform support
+- Reusable environment definitions across teams
+- Version-controlled infrastructure templates
+
+**🛡️ Enterprise Governance**
+- Built-in policy enforcement and compliance
+- Cost management and resource quotas
+- Role-based access control (RBAC)
+- Audit logging and tracking
+
+**⚡ Rapid Environment Lifecycle**
+- Quick environment creation (minutes, not hours)
+- Easy environment updates and modifications
+- Automated cleanup and cost optimization
+
+#!markdown
+
+# Demo
+
+https://devportal.microsoft.com/
+
+#!pwsh
+
+Open-EditorFile C:\repos\demos\demo-devcenter-catalog\Environment-Definitions\BicepTemplates\ContainerApp\environment.yaml
+
+#!markdown
+
+## ADE and Microsoft DevBox: Perfect Partners
+
+Azure Deployment Environments and Microsoft DevBox work hand-in-hand to provide a complete development ecosystem that addresses both **development environments** (DevBox) and **application environments** (ADE).
+
+### Unified Developer Portal Experience
+
+Both services are accessible through the **Microsoft DevBox Developer Portal**, providing developers with a single, unified interface for all their environment needs:
+
+**🖥️ [Microsoft DevBox Developer Portal](https://aka.ms/devbox-portal)**
+- **Dev Boxes**: Personal development workstations with pre-configured tools
+- **Deployment Environments**: Application infrastructure for testing and development
+- **Seamless Integration**: Switch between computing and infrastructure environments effortlessly
+- **Consistent Experience**: Same authentication, governance, and management
+
+### Complementary Capabilities
+
+| Aspect | Microsoft DevBox | Azure Deployment Environments |
+|--------|------------------|-------------------------------|
+| **Purpose** | Development workstation | Application infrastructure |
+| **What** | Pre-configured Windows VMs | Cloud resources and services |
+| **When** | Daily development work | Testing, demos, experiments |
+| **How** | Remote desktop access | Resource deployment |
+| **Duration** | Long-running (days/weeks) | Short-lived (hours/days) |
+| **Scope** | Individual developer | Team/project environments |
+
+### Integration Scenarios
+
+**🔄 Development Workflow Integration**
+1. **DevBox**: Developer codes on a standardized, powerful development machine
+2. **ADE**: Deploy application environments for testing and validation
+3. **Collaboration**: Share environment definitions and configurations
+4. **Iteration**: Rapid cycle between development and testing environments
+
+**👥 Team Collaboration**
+- **Shared Environment Definitions**: Both use template-based approaches
+- **Consistent Tooling**: Same governance, security, and access patterns
+- **Unified Management**: Single portal for all development resources
+- **Cross-Service Workflows**: Seamlessly move between development and deployment tasks
+
+### Technical Integration
+
+**🔗 Common Foundation**
+- **Azure Active Directory**: Unified identity and access management
+- **Azure RBAC**: Consistent role-based access control
+- **Azure Policy**: Shared governance and compliance framework
+- **Cost Management**: Integrated billing and cost optimization
+- **Template Sharing**: Reusable IaC templates across both services
+
+#!markdown
+
+## DevBox and ADE in Azure Landing Zones
+
+Azure Landing Zones provide the foundational architecture for enterprise cloud adoption, establishing governance, security, and connectivity patterns. DevBox and ADE play crucial roles in this architecture by enabling secure development workflows within enterprise network boundaries.
+
+### Azure Landing Zones Architecture Context
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    AZURE LANDING ZONES                         │
+│                                                                 │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐ │
+│  │   PRODUCTION    │  │   PRE-PROD      │  │    SANDBOX      │ │
+│  │   SUBSCRIPTION  │  │   SUBSCRIPTION  │  │  SUBSCRIPTION   │ │
+│  │                 │  │                 │  │                 │ │
+│  │ • Prod Apps     │  │ • DevBox Pools  │  │ • DevBox Pools  │ │
+│  │ • Databases     │  │ • ADE Projects  │  │ • ADE Projects  │ │
+│  │ • APIs          │  │ • Test Envs     │  │ • Experiments   │ │
+│  │ • Private EP    │  │ • Private EP    │  │ • Private EP    │ │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘ │
+│           │                     │                     │        │
+│           └─────────────────────┼─────────────────────┘        │
+│                                 │                              │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │              CONNECTIVITY HUB                          │   │
+│  │  • Virtual Network Gateway                             │   │
+│  │  • ExpressRoute/VPN                                    │   │
+│  │  • Azure Firewall                                      │   │
+│  │  • Private DNS Zones                                   │   │
+│  └─────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Secure Development with Private Endpoints
+
+In enterprise Azure Landing Zones, critical resources are often secured behind private endpoints and virtual networks. DevBox and ADE enable developers to work securely within these boundaries:
+
+#### **Private Endpoint Access Scenarios**
+
+**🔒 Production Resource Access**
+- **Challenge**: Production databases, APIs, and services are only accessible via private endpoints
+- **Solution**: DevBox VMs deployed within the virtual network can access private endpoints
+- **Benefit**: Developers can troubleshoot and develop against real production-like resources securely
+
+**🧪 Pre-Production Testing**
+- **Challenge**: Testing environments need realistic data and services with production security
+- **Solution**: ADE deploys test environments in pre-prod subscriptions with private endpoint connectivity
+- **Benefit**: Realistic testing scenarios without compromising production security
+
+**🏗️ Infrastructure Development**
+- **Challenge**: Developing IaC templates requires access to network-isolated resources
+- **Solution**: Both DevBox and ADE provide isolated network environments for safe development
+- **Benefit**: Iterate on infrastructure changes without affecting production networks
+
+#### **Network Connectivity Patterns**
+
+**DevBox Private Network Integration**
+```
+DevBox VM (Pre-Prod Subscription)
+    ↓ (Private Network)
+Virtual Network Peering
+    ↓
+Production VNet
+    ↓ (Private Endpoint)
+Production Database/API
+```
+
+**ADE Environment Connectivity**
+```
+ADE Environment (Sandbox Subscription)
+    ↓ (ARM/Bicep Template)
+Test App Service + Private Endpoint
+    ↓ (Virtual Network)
+Hub Network (ExpressRoute/VPN)
+    ↓
+On-Premises Resources
+```
+
+### Developer Benefits in Landing Zones
+
+**🔐 Secure by Design**
+- **Network Isolation**: Work within secure network boundaries from day one
+- **Private Access**: Direct access to private endpoints without VPN complexity
+- **Policy Compliance**: Automatic adherence to enterprise security policies
+- **Audit Trails**: All development activities logged and monitored
+
+**⚡ Enhanced Productivity**
+- **Realistic Testing**: Access to production-like environments and data
+- **Reduced Friction**: No need for complex network configurations
+- **Self-Service**: Create environments without network team involvement
+- **Consistent Experience**: Same tools and access patterns across environments
+
+**🛡️ Enterprise Governance**
+- **Cost Control**: Automatic resource lifecycle management
+- **Access Management**: Role-based access aligned with organizational structure
+- **Compliance**: Built-in compliance with enterprise policies and standards
+- **Resource Quotas**: Prevent runaway costs and resource sprawl
+
+### Implementation Patterns
+
+#### **Subscription Strategy**
+- **Sandbox Subscriptions**: DevBox pools for experimentation and learning
+- **Pre-Production Subscriptions**: ADE projects for testing and validation
+- **Shared Services**: Common resources accessible across development environments
+- **Network Connectivity**: Hub-spoke topology enabling secure cross-subscription access
+
+#### **Template Governance**
+- **Centralized Catalogs**: Approved IaC templates for common scenarios
+- **Environment Definitions**: Pre-configured environments aligned with enterprise standards
+- **Policy Enforcement**: Automatic compliance with security and governance requirements
+- **Version Control**: GitOps workflows for template management and deployment
+
+#### **Access Patterns**
+- **Just-in-Time Access**: Temporary elevated permissions for specific tasks
+- **Conditional Access**: Network location and device compliance requirements
+- **Multi-Factor Authentication**: Enhanced security for sensitive environment access
+- **Resource Tagging**: Automatic tagging for cost allocation and governance tracking
+
+### Real-World Scenarios
+
+**🏦 Financial Services Example**
+- **Production**: Core banking systems behind private endpoints
+- **Pre-Prod**: DevBox environments with access to anonymized production data
+- **Sandbox**: ADE environments for testing new financial products
+- **Compliance**: All environments meet regulatory requirements (SOX, PCI DSS)
+
+**🏥 Healthcare Organization**
+- **Production**: HIPAA-compliant applications with private database access
+- **Pre-Prod**: DevBox environments for developing patient care applications
+- **Sandbox**: ADE environments for testing ML models with synthetic data
+- **Security**: Zero-trust network access with comprehensive audit logging
+
+**🏭 Manufacturing Company**
+- **Production**: IoT data platforms accessible only via private endpoints
+- **Pre-Prod**: DevBox environments for developing operational dashboards
+- **Sandbox**: ADE environments for testing edge computing scenarios
+- **Integration**: Secure connectivity to on-premises manufacturing systems
+
+#!markdown
+
+## Best Practices for DevBox and ADE Integration
+
+### Environment Strategy
+
+**🎯 Environment Lifecycle Management**
+- **Short-Lived ADE**: Use ADE for temporary testing and validation environments
+- **Long-Lived DevBox**: Maintain DevBox environments for ongoing development work
+- **Automated Cleanup**: Implement policies for automatic environment deprovisioning
+- **Cost Optimization**: Right-size resources and implement usage policies
+
+**📋 Template Governance**
+- **Standardized Templates**: Create reusable templates for common scenarios
+- **Version Control**: Maintain templates in Git repositories with proper versioning
+- **Testing Pipeline**: Validate template changes before deploying to production catalogs
+- **Documentation**: Provide clear documentation for template usage and customization
+
+### Security and Compliance
+
+**🔐 Network Security**
+- **Private Endpoints**: Use private endpoints for all sensitive resource access
+- **Network Segmentation**: Implement proper network isolation between environments
+- **Conditional Access**: Apply conditional access policies based on network location
+- **Monitoring**: Implement comprehensive logging and monitoring for all activities
+
+**👤 Identity and Access Management**
+- **Least Privilege**: Grant minimum required permissions for each role
+- **Regular Reviews**: Conduct periodic access reviews and cleanup
+- **Service Principals**: Use managed identities for service-to-service authentication
+- **Emergency Access**: Maintain break-glass access procedures for critical situations
+
+### Developer Experience Optimization
+
+**🚀 Onboarding Process**
+1. **Initial Setup**: Provision DevBox for new team members
+2. **Template Access**: Provide access to approved ADE templates
+3. **Training**: Offer training on portal usage and best practices
+4. **Support**: Establish clear support channels and documentation
+
+**📊 Monitoring and Feedback**
+- **Usage Analytics**: Track environment usage patterns and costs
+- **Developer Feedback**: Regular surveys on developer experience and pain points
+- **Performance Metrics**: Monitor environment creation times and success rates
+- **Continuous Improvement**: Iterative improvements based on feedback and metrics
+
+## Getting Started
+
+### Prerequisites
+- Azure subscription with appropriate permissions
+- Azure Landing Zone implementation (optional but recommended)
+- Azure Active Directory tenant
+- Network connectivity planning (for private endpoint scenarios)
+
+### Quick Start Steps
+
+1. **Enable Services**
+   - Enable Microsoft DevBox and Azure Deployment Environments
+   - Configure dev centers and projects
+   - Set up appropriate RBAC permissions
+
+2. **Network Configuration**
+   - Plan virtual network topology
+   - Configure private endpoints for sensitive resources
+   - Set up network connectivity to existing infrastructure
+
+3. **Template Development**
+   - Create initial environment templates
+   - Test templates in sandbox environments
+   - Document template usage and parameters
+
+4. **Pilot Program**
+   - Start with small development team
+   - Gather feedback and iterate
+   - Scale to broader organization
+
+### Learn More
+
+**📚 Official Documentation**
+- [Azure Deployment Environments Documentation](https://learn.microsoft.com/en-us/azure/deployment-environments/)
+- [Microsoft DevBox Documentation](https://learn.microsoft.com/en-us/azure/dev-box/)
+- [Azure Landing Zones](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/landing-zone/)
+
+**🎥 Training Resources**
+- [ADE Learning Path](https://learn.microsoft.com/en-us/training/paths/azure-deployment-environments/)
+- [DevBox Learning Path](https://learn.microsoft.com/en-us/training/paths/microsoft-dev-box/)
+- [Azure Architecture Center](https://learn.microsoft.com/en-us/azure/architecture/)

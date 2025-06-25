@@ -1,0 +1,292 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"name":"csharp"},{"name":"fsharp","languageName":"F#","aliases":["f#","fs"]},{"name":"html","languageName":"HTML"},{"name":"http","languageName":"HTTP"},{"name":"javascript","languageName":"JavaScript","aliases":["js"]},{"name":"mermaid","languageName":"Mermaid"},{"name":"pwsh","languageName":"PowerShell","aliases":["powershell"]},{"name":"value"}]}}
+
+#!markdown
+
+# Configure Azure Arc-enabled servers using Azure Automanage machine configuration
+
+## Objective
+
+In this demo, we will learn to create and assign a custom Automanage Machine Configuration to an Azure Arc-enabled Windows server.
+
+#!markdown
+
+## Task 1: Create Automanage Machine Configuration custom configurations for Windows
+
+**Custom configuration for Windows**
+
+4. The first step is to install the required PowerShell modules.
+
+#!pwsh
+
+  Install-PSResource -Name Az.Accounts -Version 2.15.1 -TrustRepository -Quiet
+  Install-PSResource -Name Az.PolicyInsights -Version 1.6.4 -TrustRepository
+  Install-PSResource -Name Az.Resources -Version 6.15.1 -TrustRepository
+  Install-PSResource -Name Az.Storage -Version 6.1.1 -TrustRepository
+  Install-PSResource -Name MSI -Version 3.3.4 -TrustRepository
+  Install-PSResource -Name GuestConfiguration -Version 4.5.0 -TrustRepository
+  Install-PSResource -Name PSDesiredStateConfiguration -Version 2.0.7 -TrustRepository
+  Install-PSResource -Name PSDscResources -Version 2.12.0.0 -TrustRepository
+
+# Explicitly import these modules to prevent breaking changes in newer versions, if available
+  Import-Module -Name Az.Resources -RequiredVersion 6.15.1
+  Import-Module -Name PSDesiredStateConfiguration -Force -RequiredVersion 2.0.7
+
+  Get-Module
+
+#!pwsh
+
+  $resourceGroupName = $resourceGroup
+  $location = $env:azureLocation
+  $Win2k19vmName = "ArcBox-Win2K19"
+
+# Disconnect from Managed Idenity as we need subscription-level permissions to create Azure Policy definitions
+  Clear-AzContext -Force
+
+  # Disable LoginByWam as it is not currently working from notebooks
+  Update-AzConfig -DefaultSubscriptionForLogin $env:subscriptionId | Out-Null
+  Update-AzConfig -EnableLoginByWam $false -Scope Process | Out-Null
+
+ # Connect using your own account
+  Connect-AzAccount -Tenant $env:TenantId -UseDeviceAuthentication
+
+#!markdown
+
+The **Azure PowerShell modules** are used for:
+
+- Publishing the package to Azure storage
+- Creating a policy definition
+- Publishing the policy
+- Connecting to the Azure Arc-enabled servers
+
+The **GuestConfiguration module** automates the process of creating custom content including:
+
+- Creating a machine configuration content artifact (.zip)
+- Validating the package meets requirements
+- Installing the machine configuration agent locally for testing
+- Validating the package can be used to audit settings in a machine
+- Validating the package can be used to configure settings in a machine
+
+Version 3 of **Desired State Configuration module** is removing the dependency on MOF.
+Initially, there is only support for DSC Resources written as PowerShell classes.
+Due to using MOF-based DSC resources for the Windows demo-configuration, we are using version 2.0.5.
+
+7. Create a storage account to store the machine configurations:
+
+#!pwsh
+
+ $storageaccountsuffix = -join ((97..122) | Get-Random -Count 5 | % {[char]$_})
+ New-AzStorageAccount -ResourceGroupName $resourceGroupName -Name "machineconfigstg$storageaccountsuffix" -SkuName 'Standard_LRS' -Location $Location -OutVariable storageaccount -EnableHttpsTrafficOnly $true -AllowBlobPublicAccess $true | New-AzStorageContainer -Name machineconfiguration -Permission Blob
+
+#!markdown
+
+8. Create the custom configuration:
+
+#!pwsh
+
+Import-Module PSDesiredStateConfiguration -RequiredVersion 2.0.7
+
+$PS7Url = "https://github.com/PowerShell/PowerShell/releases/latest"
+$PS7LatestVersion = (Invoke-WebRequest -Uri $PS7url).Content | Select-String -Pattern "[0-9]+\.[0-9]+\.[0-9]+" | Select-Object -ExpandProperty Matches | Select-Object -ExpandProperty Value
+$PS7DownloadUrl = "https://github.com/PowerShell/PowerShell/releases/download/v$PS7LatestVersion/PowerShell-$PS7LatestVersion-win-x64.msi"
+#Invoke-WebRequest -Uri $PS7DownloadUrl -OutFile $env:TEMP\ps.msi
+$PS7ProductId = (Get-MSIProperty -Path $env:TEMP\ps.msi -Property ProductCode).Value
+
+Configuration PSConfEU_Windows
+{
+    param (
+        [Parameter(Mandatory)]
+        [System.Management.Automation.PSCredential]
+        [System.Management.Automation.Credential()]
+        $PasswordCredential
+    )
+
+    Import-DscResource -ModuleName 'PSDscResources' -ModuleVersion 2.12.0.0
+
+    Node localhost
+    {
+        MsiPackage PS7
+        {
+            ProductId = $PS7ProductId
+            Path = $PS7DownloadUrl
+            Ensure = 'Present'
+        }
+        User ArcBoxUser
+        {
+            UserName = '3423rfds2245fssf4'
+            FullName = 'Breakglass User'
+            Password = $PasswordCredential
+            Ensure = 'Present'
+        }
+        WindowsFeature SMB1 {
+            Name = 'FS-SMB1'
+            Ensure = 'Absent'
+        }
+    }
+}
+
+$breakglassUsername = '3423rfds2245fssf4'
+$breakglassPassword = 't!l4E0oZszT$2shh03k5#lDDKga!MA0HWcSO3RbEk2'  # In real-world scenarios this could be retrieved from an Azure Key Vault
+
+# Create credential object
+$secPassword = ConvertTo-SecureString $breakglassPassword -AsPlainText -Force
+$winCreds = New-Object System.Management.Automation.PSCredential ($breakglassUsername, $secPassword)
+
+$ConfigurationData = @{
+     AllNodes = @(
+          @{
+              NodeName = 'localhost'
+              PSDscAllowPlainTextPassword = $true
+          }
+      )
+  }
+
+$OutputPath = "C:\machine_configuration"
+New-Item $OutputPath -Force -ItemType Directory | Out-Null
+
+#!markdown
+
+9. Execute the newly created configuration:
+
+#!pwsh
+
+ PSConfEU_Windows -PasswordCredential $winCreds -ConfigurationData $ConfigurationData -OutputPath $OutputPath
+
+#!markdown
+
+10. Create a package that will audit and apply the configuration (Set):
+
+#!pwsh
+
+  New-GuestConfigurationPackage -Name 'PSConfEU_Windows' -Configuration "$OutputPath/localhost.mof" -Type AuditAndSet `
+  -Path $OutputPath `
+  -Force
+
+#!markdown
+
+11. Test applying the configuration to the local machine:
+
+#!pwsh
+
+Start-GuestConfigurationPackageRemediation -Path "$OutputPath/PSConfEU_Windows.zip"
+
+#!markdown
+
+12. Upload the configuration package to the Azure Storage Account:
+
+#!pwsh
+
+$OutputPath = "$Env:ArcBoxDir/arc_automanage_machine_configuration_custom_windows"
+
+#!pwsh
+
+  $StorageAccount = Get-AzStorageAccount -ResourceGroupName $ResourceGroupName | Where-Object StorageAccountName -like "machineconfig*"
+
+  $StorageAccountKey = Get-AzStorageAccountKey -Name $storageaccount.StorageAccountName -ResourceGroupName $storageaccount.ResourceGroupName
+  $Context = New-AzStorageContext -StorageAccountName $storageaccount.StorageAccountName -StorageAccountKey $StorageAccountKey[0].Value
+
+  Set-AzStorageBlobContent -Container "machineconfiguration" -File  "$OutputPath/TailwindTraders_Windows.zip" -Blob "TailwindTraders_Windows.zip" -Context $Context -Force
+
+  $contenturi = New-AzStorageBlobSASToken -Context $Context -FullUri -Container machineconfiguration -Blob "TailwindTraders_Windows.zip" -Permission r
+  $contenturi
+
+#!markdown
+
+13. Create an Azure Policy definition:
+
+#!pwsh
+
+  $PolicyId = (New-Guid).Guid
+
+  New-GuestConfigurationPolicy `
+    -PolicyId $PolicyId `
+    -ContentUri $ContentUri `
+    -DisplayName '(Tailwind Traders) [Windows] Standard configuration' `
+    -Description 'Tailwind Traders standard Windows configuration' `
+    -Path  $OutputPath `
+    -Platform 'Windows' `
+    -PolicyVersion 1.0.0 `
+    -Mode ApplyAndAutoCorrect `
+    -Verbose -OutVariable Policy
+
+    $PolicyParameterObject = @{'IncludeArcMachines'='true'}
+
+    New-AzPolicyDefinition -Name '(Tailwind Traders) [Windows] Standard configuration' -Policy $Policy.Path -OutVariable PolicyDefinition
+
+#!markdown
+
+14. Assign the Azure Policy definition to the target resource group:
+
+#!pwsh
+
+$ResourceGroup = Get-AzResourceGroup -Name $ResourceGroupName
+New-AzPolicyAssignment -Name '(Tailwind Traders) [Windows] Standard configuration' -PolicyDefinition $PolicyDefinition[0] -Scope $ResourceGroup.ResourceId -PolicyParameterObject $PolicyParameterObject -IdentityType SystemAssigned -Location $Location -DisplayName '(Tailwind Traders) [Windows] Standard configuration' -OutVariable PolicyAssignment
+
+#!markdown
+
+15. In order for the newly assigned policy to remediate existing resources, the policy must be assigned a **managed identity** and a **policy remediation** must be performed:
+
+#!pwsh
+
+  $PolicyAssignment = Get-AzPolicyAssignment -PolicyDefinitionId $PolicyDefinition.PolicyDefinitionId | Where-Object Name -eq '(Tailwind Traders) [Windows] Standard configuration'
+
+  $roleDefinitionIds =  $PolicyDefinition.Properties.policyRule.then.details.roleDefinitionIds
+
+  # Wait for eventual consistency
+  Start-Sleep 20
+
+  if ($roleDefinitionIds.Count -gt 0)
+   {
+       $roleDefinitionIds | ForEach-Object {
+           $roleDefId = $_.Split("/") | Select-Object -Last 1
+           New-AzRoleAssignment -Scope $resourceGroup.ResourceId -ObjectId $PolicyAssignment.Identity.PrincipalId -RoleDefinitionId $roleDefId
+       }
+   }
+
+   $job = Start-AzPolicyRemediation -AsJob -Name ($PolicyAssignment.PolicyAssignmentId -split '/')[-1] -PolicyAssignmentId $PolicyAssignment.PolicyAssignmentId -ResourceGroupName $ResourceGroup.ResourceGroupName -ResourceDiscoveryMode ReEvaluateCompliance
+
+#!markdown
+
+16. To check policy compliance, in the Azure Portal, navigate to *Policy* -> **Compliance**
+
+17. Set the scope to the resource group your instance of ArcBox is deployed to
+
+18. Filter for *(Tailwind Traders) [Windows] Standard configuration*
+
+    ![Screenshot of Azure Portal showing Azure Policy compliance](./images/portal_policy_compliance.png)
+
+>It may take 15-20 minutes for the policy remediation to be completed.
+
+19. To get a Machine Configuration status for a specific machine, navigate to _Azure Arc_ -> **Machines**
+
+20. Click on $MachineName -> **Machine Configuration**
+
+- If the status for _$MachineName/(Tailwind Traders) [Windows] Standard configuration_ is **not Compliant**, wait a few more minutes and click *Refresh*
+
+    ![Screenshot of Azure Portal showing Azure Machine Configuration compliance](./images/portal_machine_config_compliance.png)
+
+21. Click on _$MachineName/(Tailwind Traders) [Windows] Standard configuration_ to get a per-resource view of the compliance state in the assigned configuration
+
+    ![Screenshot of Azure Portal showing Azure Machine Configuration compliance detailed view](./images/portal_machine_config_configs.png)
+
+**Verify that the operating system level settings are in place:**
+
+1. To verify that the operating system level settings are in place, run the following PowerShell commands:
+
+#!pwsh
+
+  Write-Host "Creating VM Credentials"
+  $nestedWindowsUsername = "Administrator"
+  $secWindowsPassword = ConvertTo-SecureString $nestedWindowsPassword -AsPlainText -Force
+  $winCreds = New-Object System.Management.Automation.PSCredential ($nestedWindowsUsername, $secWindowsPassword)
+
+  Invoke-Command -VMName $Win2k19vmName -ScriptBlock { Get-LocalUser -Name arcboxuser1 } -Credential $winCreds
+  Invoke-Command -VMName $Win2k19vmName -ScriptBlock {  Get-WindowsFeature -Name FS-SMB1 | select  DisplayName,Installed,InstallState} -Credential $winCreds
+
+#!markdown
+
+  ![Screenshot of VScode showing Azure Machine Configuration validation on Windows](./images/vscode_win_machine_config_validation.png)
+
+> **Bonus task**:
+If you are interested in custom configurations on Linux, check out the Azure Arc Jumpstart scenario [Create Automanage Machine Configuration custom configurations for Linux](https://azurearcjumpstart.com/azure_arc_jumpstart/azure_arc_servers/day2/arc_automanage/arc_automanage_machine_configuration_custom_linux) which you can run in your instance of ArcBox.

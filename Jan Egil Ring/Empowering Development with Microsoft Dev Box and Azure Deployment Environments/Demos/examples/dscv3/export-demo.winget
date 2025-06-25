@@ -1,0 +1,283 @@
+# Created using winget configure export 1.11.400
+# yaml-language-server: $schema=https://aka.ms/configuration-dsc-schema/0.3
+$schema: https://raw.githubusercontent.com/PowerShell/DSC/main/schemas/2023/08/config/document.json
+metadata:
+  winget:
+    processor:
+      identifier: "dscv3"
+resources:
+- name: Microsoft.WinGet/Package_nsrn5qr8
+  type: Microsoft.WinGet/Package
+  metadata:
+    description: "Configure Microsoft.PowerShell"
+  properties:
+    id: "Microsoft.PowerShell"
+    source: "winget"
+- name: Microsoft.WinGet/UserSettingsFile-0
+  type: Microsoft.WinGet/UserSettingsFile
+  properties:
+    settings: {}
+- name: Microsoft.WinGet/AdminSettings-0
+  type: Microsoft.WinGet/AdminSettings
+  metadata:
+    winget:
+      securityContext: "elevated"
+  properties:
+    settings:
+      LocalManifestFiles: false
+      ProxyCommandLineOptions: false
+      BypassCertificatePinningForMicrosoftStore: false
+      InstallerHashOverride: false
+      LocalArchiveMalwareScanOverride: false
+- name: Microsoft.DSC.Transitional/RunCommandOnSet_f0o6p6lg
+  type: Microsoft.DSC.Transitional/RunCommandOnSet
+  metadata:
+    description: "Configure Microsoft.Windows.Settings"
+  dependsOn:
+  - Microsoft.WinGet/Package_nsrn5qr8
+  properties:
+    arguments:
+    - "-NoProfile"
+    - "-NoLogo"
+    - "-Command"
+    - "if (-not (Get-Module -ListAvailable -Name Microsoft.Windows.Settings)) { Install-Module
+      -Name Microsoft.Windows.Settings -Confirm:$False -Force -AllowPrerelease -AllowClobber
+      }"
+    executable: "pwsh"
+- name: Microsoft.Windows.Settings/WindowsSettings_e0r43q9p
+  type: Microsoft.Windows.Settings/WindowsSettings
+  metadata:
+    description: "Configure Microsoft.Windows.Settings/WindowsSettings"
+    winget:
+      securityContext: "elevated"
+  dependsOn:
+  - Microsoft.DSC.Transitional/RunCommandOnSet_f0o6p6lg
+  properties:
+    SystemColorMode: "Dark"
+    DeveloperMode: true
+    TaskbarAlignment: "Left"
+    AppColorMode: "Dark"
+- name: winget_Microsoft.Git
+  type: Microsoft.WinGet/Package
+  metadata:
+    description: "Install Microsoft.Git"
+  properties:
+    id: "Microsoft.Git"
+    source: "winget"
+- name: winget_Microsoft.VSTOR
+  type: Microsoft.WinGet/Package
+  metadata:
+    description: "Install Microsoft.VSTOR"
+  properties:
+    id: "Microsoft.VSTOR"
+    source: "winget"
+- name: winget_Microsoft.Office
+  type: Microsoft.WinGet/Package
+  metadata:
+    description: "Install Microsoft.Office"
+  properties:
+    id: "Microsoft.Office"
+    source: "winget"
+- name: winget_Microsoft.OneDrive
+  type: Microsoft.WinGet/Package
+  metadata:
+    description: "Install Microsoft.OneDrive"
+  properties:
+    id: "Microsoft.OneDrive"
+    source: "winget"
+- name: winget_Unity.UnityHub
+  type: Microsoft.WinGet/Package
+  metadata:
+    description: "Install Unity.UnityHub"
+  properties:
+    id: "Unity.UnityHub"
+    source: "winget"
+- name: winget_Microsoft.RemoteDesktopMMRService
+  type: Microsoft.WinGet/Package
+  metadata:
+    description: "Install Microsoft.RemoteDesktopMMRService"
+  properties:
+    id: "Microsoft.RemoteDesktopMMRService"
+    source: "winget"
+- name: winget_Microsoft.msodbcsql.17
+  type: Microsoft.WinGet/Package
+  metadata:
+    description: "Install Microsoft.msodbcsql.17"
+  properties:
+    id: "Microsoft.msodbcsql.17"
+    source: "winget"
+- name: winget_Microsoft.WindowsVirtualDesktopAgent
+  type: Microsoft.WinGet/Package
+  metadata:
+    description: "Install Microsoft.WindowsVirtualDesktopAgent"
+  properties:
+    id: "Microsoft.WindowsVirtualDesktopAgent"
+    source: "winget"
+- name: winget_Microsoft.Azd
+  type: Microsoft.WinGet/Package
+  metadata:
+    description: "Install Microsoft.Azd"
+  properties:
+    id: "Microsoft.Azd"
+    source: "winget"
+- name: winget_Microsoft.CLRTypesSQLServer.2019
+  type: Microsoft.WinGet/Package
+  metadata:
+    description: "Install Microsoft.CLRTypesSQLServer.2019"
+  properties:
+    id: "Microsoft.CLRTypesSQLServer.2019"
+    source: "winget"
+- name: winget_Microsoft.WindowsVirtualDesktopBootloader
+  type: Microsoft.WinGet/Package
+  metadata:
+    description: "Install Microsoft.WindowsVirtualDesktopBootloader"
+  properties:
+    id: "Microsoft.WindowsVirtualDesktopBootloader"
+    source: "winget"
+- name: winget_GitHub.cli
+  type: Microsoft.WinGet/Package
+  metadata:
+    description: "Install GitHub.cli"
+  properties:
+    id: "GitHub.cli"
+    source: "winget"
+- name: winget_Microsoft.WebDeploy
+  type: Microsoft.WinGet/Package
+  metadata:
+    description: "Install Microsoft.WebDeploy"
+  properties:
+    id: "Microsoft.WebDeploy"
+    source: "winget"
+- name: winget_Microsoft.PowerShell
+  type: Microsoft.WinGet/Package
+  metadata:
+    description: "Install Microsoft.PowerShell"
+  properties:
+    id: "Microsoft.PowerShell"
+    source: "winget"
+- name: winget_Microsoft.VisualStudioCode
+  type: Microsoft.WinGet/Package
+  metadata:
+    description: "Install Microsoft.VisualStudioCode"
+  properties:
+    id: "Microsoft.VisualStudioCode"
+    source: "winget"
+- name: winget_Microsoft.VisualStudio.2022.Enterprise
+  type: Microsoft.WinGet/Package
+  metadata:
+    description: "Install Microsoft.VisualStudio.2022.Enterprise"
+  properties:
+    id: "Microsoft.VisualStudio.2022.Enterprise"
+    source: "winget"
+- name: winget_Microsoft.Edge
+  type: Microsoft.WinGet/Package
+  metadata:
+    description: "Install Microsoft.Edge"
+  properties:
+    id: "Microsoft.Edge"
+    source: "winget"
+- name: winget_Microsoft.VCRedist.2015+.x86
+  type: Microsoft.WinGet/Package
+  metadata:
+    description: "Install Microsoft.VCRedist.2015+.x86"
+  properties:
+    id: "Microsoft.VCRedist.2015+.x86"
+    source: "winget"
+- name: winget_Microsoft.DotNet.SDK.9
+  type: Microsoft.WinGet/Package
+  metadata:
+    description: "Install Microsoft.DotNet.SDK.9"
+  properties:
+    id: "Microsoft.DotNet.SDK.9"
+    source: "winget"
+- name: winget_Microsoft.AzureCLI
+  type: Microsoft.WinGet/Package
+  metadata:
+    description: "Install Microsoft.AzureCLI"
+  properties:
+    id: "Microsoft.AzureCLI"
+    source: "winget"
+- name: winget_Microsoft.VCRedist.2015+.x64
+  type: Microsoft.WinGet/Package
+  metadata:
+    description: "Install Microsoft.VCRedist.2015+.x64"
+  properties:
+    id: "Microsoft.VCRedist.2015+.x64"
+    source: "winget"
+- name: winget_Helm.Helm
+  type: Microsoft.WinGet/Package
+  metadata:
+    description: "Install Helm.Helm"
+  properties:
+    id: "Helm.Helm"
+    source: "winget"
+- name: winget_Kubernetes.kubectl
+  type: Microsoft.WinGet/Package
+  metadata:
+    description: "Install Kubernetes.kubectl"
+  properties:
+    id: "Kubernetes.kubectl"
+    source: "winget"
+- name: winget_Microsoft.Azure.AZCopy.10
+  type: Microsoft.WinGet/Package
+  metadata:
+    description: "Install Microsoft.Azure.AZCopy.10"
+  properties:
+    id: "Microsoft.Azure.AZCopy.10"
+    source: "winget"
+- name: winget_Microsoft.Sysinternals.BGInfo
+  type: Microsoft.WinGet/Package
+  metadata:
+    description: "Install Microsoft.Sysinternals.BGInfo"
+  properties:
+    id: "Microsoft.Sysinternals.BGInfo"
+    source: "winget"
+- name: winget_Postman.Postman
+  type: Microsoft.WinGet/Package
+  metadata:
+    description: "Install Postman.Postman"
+  properties:
+    id: "Postman.Postman"
+    source: "winget"
+- name: winget_Microsoft.PowerToys
+  type: Microsoft.WinGet/Package
+  metadata:
+    description: "Install Microsoft.PowerToys"
+  properties:
+    id: "Microsoft.PowerToys"
+    source: "winget"
+- name: winget_Microsoft.Teams
+  type: Microsoft.WinGet/Package
+  metadata:
+    description: "Install Microsoft.Teams"
+  properties:
+    id: "Microsoft.Teams"
+    source: "winget"
+- name: winget_Microsoft.AppInstaller
+  type: Microsoft.WinGet/Package
+  metadata:
+    description: "Install Microsoft.AppInstaller"
+  properties:
+    id: "Microsoft.AppInstaller"
+    source: "winget"
+- name: winget_Microsoft.UI.Xaml.2.8
+  type: Microsoft.WinGet/Package
+  metadata:
+    description: "Install Microsoft.UI.Xaml.2.8"
+  properties:
+    id: "Microsoft.UI.Xaml.2.8"
+    source: "winget"
+- name: winget_Microsoft.VCLibs.Desktop.14
+  type: Microsoft.WinGet/Package
+  metadata:
+    description: "Install Microsoft.VCLibs.Desktop.14"
+  properties:
+    id: "Microsoft.VCLibs.Desktop.14"
+    source: "winget"
+- name: winget_Microsoft.WindowsTerminal
+  type: Microsoft.WinGet/Package
+  metadata:
+    description: "Install Microsoft.WindowsTerminal"
+  properties:
+    id: "Microsoft.WindowsTerminal"
+    source: "winget"

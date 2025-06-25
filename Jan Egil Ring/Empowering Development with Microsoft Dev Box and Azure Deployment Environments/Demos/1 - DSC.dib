@@ -1,0 +1,565 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"name":"csharp"},{"name":"fsharp","languageName":"F#","aliases":["f#","fs"]},{"name":"html","languageName":"HTML"},{"name":"http","languageName":"HTTP"},{"name":"javascript","languageName":"JavaScript","aliases":["js"]},{"name":"mermaid","languageName":"Mermaid"},{"name":"pwsh","languageName":"PowerShell","aliases":["powershell"]},{"name":"value"}]}}
+
+#!markdown
+
+## PowerShell DSC
+
+PowerShell Desired State Configuration (DSC) is a declarative configuration platform that allows you to define the desired state of your Windows systems using PowerShell syntax. Instead of writing imperative scripts that describe how to configure a system, DSC lets you declare what the end state should look like, and the platform handles the implementation details.
+
+### What is PowerShell DSC?
+
+DSC is a management platform in PowerShell that enables you to:
+- **Declare** the configuration state for your systems
+- **Deploy** configuration settings automatically
+- **Monitor** and maintain configuration compliance
+- **Remediate** configuration drift when systems deviate from desired state
+
+### Key Concepts
+
+**Configuration**: A PowerShell script that defines the desired state using the `Configuration` keyword
+**Resources**: The building blocks that perform the actual configuration work (e.g., File, Registry, Service)
+**MOF Files**: Managed Object Format files that contain the compiled configuration to be applied
+**Local Configuration Manager (LCM)**: The engine that applies and maintains DSC configurations
+
+### Benefits
+
+- **Idempotent**: Can be run multiple times safely with the same result
+- **Declarative**: Focuses on "what" rather than "how"
+- **Self-Healing**: Can automatically correct configuration drift
+- **Auditing**: Provides visibility into system compliance
+- **Reusable**: Configurations can be applied across multiple systems
+
+#!pwsh
+
+# Simple DSC Configuration Example - Environment Variable
+Configuration EnvironmentVariable_Example
+{
+    param ()
+
+    Import-DscResource -ModuleName 'PSDscResources'
+
+    Node localhost
+    {
+        Environment CreateDemoEnvironmentVariable
+        {
+            Name = 'DSC_DEMO_VARIABLE'
+            Value = 'Hello from PowerShell DSC!'
+            Ensure = 'Present'
+            Path = $false
+            Target = 'User'
+        }
+    }
+}
+
+# Generate the MOF file (configuration document)
+EnvironmentVariable_Example -OutputPath "./DSC_Demo"
+
+#!pwsh
+
+# Install required DSC resources module (if not already installed)
+# Install-Module 'PSDscResources' -Force -Verbose
+
+# Apply the DSC configuration to the local machine
+# Note: Requires elevated permissions
+# Start-DscConfiguration -Path './DSC_Demo' -Wait -Verbose
+
+# Check the current configuration status
+# Get-DscConfiguration
+
+# Test if the configuration is compliant
+# Test-DscConfiguration -Path './DSC_Demo' -Verbose
+
+#!markdown
+
+### DSC Example Explanation
+
+The above example demonstrates a basic DSC configuration that:
+
+1. **Defines a Configuration**: Creates a function called `EnvironmentVariable_Example`
+2. **Imports DSC Resources**: Uses the `PSDscResources` module for environment variable management
+3. **Targets localhost**: Applies the configuration to the local machine
+4. **Creates Environment Variable**: Ensures a specific environment variable exists with a defined value
+5. **Generates MOF**: Compiles the configuration into a MOF file for deployment
+
+**Key Properties**:
+- `Name`: The environment variable name
+- `Value`: The value to set
+- `Ensure`: Whether the variable should be 'Present' or 'Absent'
+- `Path`: Whether to treat as a PATH variable (false in this case)
+- `Target`: Where to set the variable (Process and Machine scope)
+
+**Workflow**:
+1. Define the configuration (first cell)
+2. Install required modules (second cell - commented for safety)
+3. Apply the configuration (second cell - commented for safety)
+4. Verify the configuration was applied successfully
+
+#!markdown
+
+# Microsoft Desired State Configuration (DSC)
+
+## Introduction to DSC
+
+Microsoft Desired State Configuration (DSC) is a configuration management platform that enables you to manage your IT infrastructure through declarative configuration documents. DSC represents a fundamental shift from imperative scripting to declarative configuration management, allowing you to define **what** your systems should look like rather than **how** to configure them.
+
+### DSC Evolution and Versions
+
+Microsoft offers multiple DSC implementations to meet different needs:
+
+#### **DSC v3.1** (Latest - Cross-Platform)
+- **Platform**: Cross-platform (Windows, Linux, macOS)
+- **Language**: JSON-based configuration documents
+- **Architecture**: Standalone tool with JSON schemas
+- **Use Case**: Modern cloud-native environments and cross-platform scenarios
+
+#### **PowerShell DSC v2.0** (PowerShell 7.x)
+- **Platform**: Cross-platform PowerShell 7.x
+- **Language**: PowerShell syntax with `Invoke-DscResource` cmdlet
+- **Architecture**: Resource-based invocation model
+- **Use Case**: PowerShell-centric environments with modern tooling
+
+#### **Windows PowerShell DSC v1.1** (Classic)
+- **Platform**: Windows-only (Windows PowerShell 5.1)
+- **Language**: PowerShell syntax with `Configuration` keyword
+- **Architecture**: Traditional MOF-based configuration documents
+- **Use Case**: Windows-specific environments and legacy systems
+
+### Core DSC Principles
+
+**📋 Declarative Configuration**
+- Define the desired end state, not the steps to achieve it
+- Configuration documents describe "what," not "how"
+- Platform handles implementation details automatically
+
+**🔄 Idempotent Operations**
+- Configurations can be applied multiple times safely
+- System reaches the same desired state regardless of starting point
+- No unintended side effects from repeated applications
+
+**🛠️ Resource-Based Management**
+- Resources are the fundamental building blocks
+- Each resource manages a specific aspect of system configuration
+- Resources handle detection, enforcement, and validation
+
+**🎯 Desired State Enforcement**
+- Continuously monitor system state against desired configuration
+- Automatically remediate configuration drift
+- Provide compliance reporting and auditing capabilities
+
+### Why Use DSC?
+
+**For IT Operations**
+- Reduces manual configuration errors
+- Ensures consistent system states across environments
+- Provides audit trails and compliance reporting
+- Enables infrastructure as code practices
+
+**For Development Teams**
+- Standardizes development environment setup
+- Integrates with CI/CD pipelines
+- Supports version-controlled infrastructure
+- Facilitates automated testing and deployment
+
+**For Enterprise Architecture**
+- Scales across thousands of systems
+- Integrates with enterprise management tools
+- Supports hybrid and cloud scenarios
+- Provides centralized policy enforcement
+
+### DSC in the Configuration-as-Code Ecosystem
+
+DSC serves as the **foundation layer** for Microsoft's configuration management ecosystem:
+
+- **🔧 Foundation**: DSC provides core configuration capabilities
+- **📦 Package Management**: WinGet Configuration leverages DSC resources
+- **🏗️ Orchestration**: Microsoft DevBox uses DSC through WinGet Configuration
+- **☁️ Cloud Integration**: Azure services utilize DSC for compliance and automation
+
+## DSC v3 Demo: Windows Settings Management
+
+### Overview
+
+DSC v3 introduces powerful capabilities for managing Windows settings through declarative configuration files. This demo showcases how to customize Windows settings and demonstrates the export/import workflow for capturing and replicating system configurations.
+
+### Key Scenarios We'll Explore
+
+1. **Windows Settings Customization**: Configure system settings like display, accessibility, and user preferences
+2. **Configuration Export**: Capture current system state from a reference machine
+3. **Configuration Import**: Apply exported settings to new or different systems
+4. **Settings Validation**: Verify configuration compliance and detect drift
+
+### Demo Architecture
+
+```
+┌─────────────────┐    Export     ┌─────────────────┐    Import     ┌─────────────────┐
+│   Reference     │ ────────────→ │ Configuration   │ ────────────→ │   Target        │
+│   Machine       │               │ Document        │               │   Machine       │
+│ (Configured)    │               │ (JSON/YAML)     │               │ (Clean State)   │
+└─────────────────┘               └─────────────────┘               └─────────────────┘
+         │                                 │                                 │
+         ▼                                 ▼                                 ▼
+   Current Settings              DSC v3 Resources                  Applied Settings
+   - Display Config              - Windows Registry              - Display Config
+   - Accessibility               - File System                   - Accessibility  
+   - User Preferences            - Environment Variables         - User Preferences
+   - Privacy Settings            - User Account Settings         - Privacy Settings
+```
+
+### Windows Settings DSC Resources - a glimse into the future
+
+The goal is to provide comprehensive resources for Windows settings management:
+
+#### **Display and Visual Settings**
+- **Microsoft.Windows.DisplaySettings**: Monitor resolution, scaling, orientation
+- **Microsoft.Windows.Personalization**: Themes, wallpapers, accent colors
+- **Microsoft.Windows.Accessibility**: High contrast, narrator, magnifier settings
+
+#### **Privacy and Security Settings**  
+- **Microsoft.Windows.Privacy**: App permissions, location services, diagnostics
+- **Microsoft.Windows.Security**: Windows Defender, firewall, UAC settings
+- **Microsoft.Windows.Updates**: Windows Update policies and scheduling
+
+#### **User Experience Settings**
+- **Microsoft.Windows.StartMenu**: Start menu layout and pinned applications
+- **Microsoft.Windows.Taskbar**: Taskbar configuration and system tray settings
+- **Microsoft.Windows.Explorer**: File Explorer preferences and folder options
+
+**Disclaimer**: These modules and the following examples does not exist today, it is a prediction on what it might look like - inspired by the prototypes in the [winget-dsc GitHub repository](https://github.com/microsoft/winget-dsc/tree/main/resources) (incubation space for resources and samples).
+
+### Configuration Export Process
+
+#### **Step 1: Prepare Reference Machine**
+
+Configure your reference machine with desired settings:
+- Set display preferences (resolution, scaling, multiple monitors)
+- Configure accessibility options (narrator, high contrast, font sizes)
+- Customize privacy settings (location, diagnostics, app permissions)
+- Set user preferences (theme, start menu, taskbar layout)
+
+#### **Step 2: Export Current Configuration**
+
+Use DSC v3 tools to export current system state:
+
+```powershell
+# Export all Windows settings to configuration document
+dsc config export --resource Microsoft.Windows.* --output windows-settings.dsc.yaml
+
+# Export specific setting categories
+dsc config export --resource Microsoft.Windows.DisplaySettings --output display-config.dsc.yaml
+dsc config export --resource Microsoft.Windows.Privacy --output privacy-config.dsc.yaml
+dsc config export --resource Microsoft.Windows.Accessibility --output accessibility-config.dsc.yaml
+```
+
+#### **Step 3: Review and Customize Exported Configuration**
+
+Example exported configuration for display settings:
+
+```yaml
+# windows-settings.dsc.yaml
+$schema: https://aka.ms/configuration-dsc-schema/0.2
+resources:
+  - resource: Microsoft.Windows.DisplaySettings
+    id: PrimaryDisplay
+    directives:
+      description: "Configure primary display settings"
+    settings:
+      displayIndex: 0
+      resolution:
+        width: 1920
+        height: 1080
+      scalingFactor: 125
+      orientation: "Landscape"
+      
+  - resource: Microsoft.Windows.Accessibility
+    id: AccessibilityFeatures
+    directives:
+      description: "Configure accessibility options"
+    settings:
+      narrator:
+        enabled: false
+        voiceSpeed: 5
+      highContrast:
+        enabled: false
+        theme: "None"
+      magnifier:
+        enabled: false
+        magnificationLevel: 200
+        
+  - resource: Microsoft.Windows.Privacy
+    id: PrivacySettings
+    directives:
+      description: "Configure privacy preferences"
+    settings:
+      locationService: false
+      diagnosticData: "Required"
+      tailoredExperiences: false
+      advertisingId: false
+```
+
+### Configuration Import and Application
+
+#### **Step 1: Validate Configuration**
+
+Before applying, validate the configuration document:
+
+```powershell
+# Test configuration syntax and resource availability
+dsc config test --document windows-settings.dsc.yaml
+
+# Validate specific resources
+dsc resource test --resource Microsoft.Windows.DisplaySettings --input display-config.json
+```
+
+#### **Step 2: Apply Configuration**
+
+Deploy the configuration to target systems:
+
+```powershell
+# Apply complete configuration
+dsc config set --document windows-settings.dsc.yaml
+
+# Apply with detailed output
+dsc config set --document windows-settings.dsc.yaml --verbose
+
+# Apply specific sections only
+dsc config set --document privacy-config.dsc.yaml
+```
+
+#### **Step 3: Verify Configuration Compliance**
+
+Monitor and validate applied settings:
+
+```powershell
+# Check current configuration state
+dsc config get --document windows-settings.dsc.yaml
+
+# Test compliance against desired state
+dsc config test --document windows-settings.dsc.yaml
+
+# Generate compliance report
+dsc config test --document windows-settings.dsc.yaml --output compliance-report.json
+```
+
+### Advanced Scenarios
+
+#### **Multi-Environment Deployment**
+
+Deploy consistent settings across development environments:
+
+```yaml
+# dev-environment-settings.dsc.yaml
+$schema: https://aka.ms/configuration-dsc-schema/0.2
+metadata:
+  name: "Development Environment Settings"
+  description: "Standardized settings for development machines"
+  version: "1.0.0"
+  
+resources:
+  - resource: Microsoft.Windows.DisplaySettings
+    id: DeveloperDisplay
+    settings:
+      resolution:
+        width: 2560
+        height: 1440
+      scalingFactor: 150
+      
+  - resource: Microsoft.Windows.Privacy
+    id: DeveloperPrivacy
+    settings:
+      locationService: false
+      diagnosticData: "Optional"
+      developerMode: true
+      
+  - resource: Microsoft.Windows.StartMenu
+    id: DeveloperStartMenu
+    settings:
+      pinnedApps:
+        - "Microsoft.VisualStudioCode"
+        - "Microsoft.WindowsTerminal" 
+        - "Git.Git"
+        - "Microsoft.PowerShell"
+```
+
+#### **Conditional Configuration**
+
+Apply different settings based on system characteristics:
+
+```yaml
+# conditional-settings.dsc.yaml
+$schema: https://aka.ms/configuration-dsc-schema/0.2
+resources:
+  - resource: Microsoft.Windows.DisplaySettings
+    id: LaptopDisplay
+    dependsOn: ["SystemType"]
+    directives:
+      description: "Laptop-specific display settings"
+      allowPrerelease: true
+    settings:
+      adaptiveBrightness: true
+      powerSavingMode: true
+    condition: 
+      resource: Microsoft.Windows.SystemInfo
+      property: "chassisType"
+      equals: "Laptop"
+      
+  - resource: Microsoft.Windows.DisplaySettings  
+    id: DesktopDisplay
+    directives:
+      description: "Desktop-specific display settings"
+    settings:
+      adaptiveBrightness: false
+      powerSavingMode: false
+    condition:
+      resource: Microsoft.Windows.SystemInfo
+      property: "chassisType" 
+      equals: "Desktop"
+```
+
+### Integration with DevBox
+
+#### **DevBox Pool Configuration**
+
+Include Windows settings configuration in DevBox definitions:
+
+```yaml
+# devbox-windows-settings.dsc.yaml
+$schema: https://aka.ms/configuration-dsc-schema/0.2
+metadata:
+  name: "DevBox Standard Settings"
+  description: "Corporate standard Windows settings for DevBox"
+  
+resources:
+  - resource: Microsoft.Windows.Privacy
+    id: CorporatePrivacy
+    settings:
+      locationService: false
+      diagnosticData: "Required"
+      tailoredExperiences: false
+      cortana: false
+      
+  - resource: Microsoft.Windows.Security
+    id: CorporateSecurity
+    settings:
+      windowsDefender:
+        realTimeProtection: true
+        cloudDeliveredProtection: true
+      firewall:
+        enabled: true
+        notificationsEnabled: false
+        
+  - resource: Microsoft.Windows.Updates
+    id: CorporateUpdates
+    settings:
+      automaticUpdates: true
+      updateSchedule: "MaintenanceWindow"
+      restartNotifications: true
+      deferFeatureUpdates: 90
+      deferQualityUpdates: 7
+```
+
+### Demo Benefits and Use Cases
+
+#### **Development Team Standardization**
+- **Consistent Environments**: All developers have identical Windows settings
+- **Reduced Onboarding Time**: New team members get pre-configured environments
+- **Compliance Enforcement**: Corporate policies applied automatically
+- **Troubleshooting Simplified**: Known baseline configuration for support
+
+#### **Enterprise Governance**
+- **Policy Compliance**: Automated enforcement of security and privacy policies
+- **Audit Trails**: Configuration changes tracked and documented
+- **Drift Detection**: Identify when systems deviate from desired state
+- **Scalable Management**: Deploy settings to thousands of systems efficiently
+
+#### **DevOps Integration**
+- **Infrastructure as Code**: Windows settings managed alongside application configuration
+- **Version Control**: Configuration documents stored in Git repositories  
+- **CI/CD Integration**: Automated deployment of settings updates
+- **Testing Automation**: Validate configuration changes in test environments
+
+### Troubleshooting and Monitoring
+
+#### **Common Issues and Solutions**
+
+**Configuration Conflicts:**
+```powershell
+# Identify conflicting resources
+dsc config test --document windows-settings.dsc.yaml --detailed
+
+# Resolve conflicts by adjusting resource dependencies
+# Update configuration with proper dependsOn relationships
+```
+
+**Permission Issues:**
+```powershell
+# Run with elevated privileges for system-level settings
+# Some resources require administrator rights
+sudo dsc config set --document windows-settings.dsc.yaml
+```
+
+**Resource Availability:**
+```powershell
+# Check if required DSC resources are installed
+dsc resource list --name Microsoft.Windows.*
+
+# Install missing resources
+winget install Microsoft.DSC.WindowsResources
+```
+
+#### **Monitoring and Reporting**
+
+```powershell
+# Continuous monitoring setup
+$watcher = {
+    while ($true) {
+        $compliance = dsc config test --document windows-settings.dsc.yaml --output json | ConvertFrom-Json
+        if ($compliance.inDesiredState -eq $false) {
+            Write-Warning "Configuration drift detected!"
+            # Send alert or trigger remediation
+        }
+        Start-Sleep -Seconds 300  # Check every 5 minutes
+    }
+}
+
+Start-Job -ScriptBlock $watcher
+```
+
+This demo showcases the power of DSC v3 for Windows settings management, providing a foundation for standardized, compliant, and maintainable system configurations across development environments.
+
+---
+
+## Learn More
+
+To dive deeper into Microsoft Desired State Configuration (DSC), explore the following resources:
+
+- **Official Documentation**: Comprehensive guides and references for DSC
+- **DSC GitHub Repository**: Access to DSC source code, issues, and contributions
+- **Community Forums**: Engage with the DSC community for support and best practices
+- **Blog Posts and Tutorials**: Hands-on examples and advanced DSC scenarios
+
+Stay updated with the latest DSC developments and enhance your configuration management skills!
+
+#!markdown
+
+## Learn More
+
+### Microsoft Build 2025 Session
+
+For a comprehensive deep dive into WinGet and Microsoft Desired State Configuration, watch this excellent session from Microsoft Build 2025:
+
+**🎥 [Simplify dev setup with WinGet & Microsoft Desired State Configuration | BRK228](https://www.youtube.com/watch?v=C3JQiQb7k60)**
+
+This session covers:
+- Modern approaches to development environment setup
+- Integration patterns between WinGet and DSC
+- Real-world implementation scenarios
+- Best practices for enterprise deployment
+- Live demonstrations and practical examples
+
+### Additional Resources
+
+- **[PowerShell DSC Documentation](https://learn.microsoft.com/en-us/powershell/dsc/)** - Official Microsoft documentation
+- **[WinGet Configuration Guide](https://learn.microsoft.com/en-us/windows/package-manager/configuration/)** - Comprehensive configuration documentation
+- **[DevBox Customizations](https://learn.microsoft.com/en-us/azure/dev-box/concept-what-are-team-customizations)** - Team customization implementation guide

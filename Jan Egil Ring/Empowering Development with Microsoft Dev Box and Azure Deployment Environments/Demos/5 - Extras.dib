@@ -1,0 +1,591 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"name":"csharp"},{"name":"fsharp","languageName":"F#","aliases":["f#","fs"]},{"name":"html","languageName":"HTML"},{"name":"http","languageName":"HTTP"},{"name":"javascript","languageName":"JavaScript","aliases":["js"]},{"name":"mermaid","languageName":"Mermaid"},{"name":"pwsh","languageName":"PowerShell","aliases":["powershell"]},{"name":"value"}]}}
+
+#!markdown
+
+# DevBox Extras: Dev Tunnels with VS Code
+
+## Overview
+
+Dev Tunnels provide a secure, cloud-based connection method to access your Microsoft DevBox environment directly through Visual Studio Code. This feature enables developers to work remotely while coding locally, creating a seamless development experience without the need for traditional Remote Desktop connections.
+
+### What are Dev Tunnels?
+
+Dev Tunnels create a secure connection between your local VS Code and your DevBox, allowing you to:
+
+- **Remote Development**: Access your DevBox filesystem and terminal from local VS Code
+- **Secure Connection**: End-to-end encrypted tunnel without exposing RDP ports
+- **Lightweight Access**: Code editor experience without full desktop overhead
+- **Cross-Platform Support**: Work from any device with VS Code installed
+
+### Benefits Over Traditional RDP
+
+| Aspect | RDP Connection | Dev Tunnels |
+|--------|----------------|-------------|
+| **Resource Usage** | Full desktop environment | Code editor only |
+| **Network Bandwidth** | High (graphics, desktop) | Low (text, files) |
+| **Startup Time** | Windows desktop boot | Instant VS Code connection |
+| **Device Requirements** | RDP/Windows App client needed | VS Code (any platform) |
+| **Offline Capability** | None | Local file caching |
+| **Multi-tasking** | Single desktop session | Local + remote development |
+
+## Setting Up Dev Tunnels
+
+### Prerequisites
+
+Before setting up Dev Tunnels, ensure you have:
+
+1. **A Microsoft DevBox** - If you don't have one, follow the [DevBox quickstart guide](https://learn.microsoft.com/en-us/azure/dev-box/quickstart-create-dev-box)
+2. **Local VS Code** - Install Visual Studio Code on your local machine
+3. **DevBox Extension** - Version 2.0.0 or later required
+
+### Step-by-Step Setup
+
+#### **Step 1: Install the Dev Box Extension**
+
+Install the [Dev Box extension](https://marketplace.visualstudio.com/items?itemName=DevCenter.ms-devbox) from the VS Code Extension Marketplace on your **local** VS Code instance.
+
+```bash
+# Install via VS Code CLI (if available)
+code --install-extension DevCenter.ms-devbox
+```
+
+> ⚠️ **Important**: Install the extension locally, NOT on the DevBox you want to connect to.
+
+#### **Step 2: Sign In to the Dev Box Extension**
+
+1. Select the **Dev Box** icon in the left sidebar
+2. Click **Sign In** to authenticate with your Azure account
+3. Grant necessary permissions for DevBox access
+
+#### **Step 3: Create and Enable Dev Box Tunnel**
+
+1. After signing in, you'll see all accessible projects
+2. Choose the project containing your DevBox
+3. Select the specific DevBox you want to connect to
+
+**⚠️ Critical Step: Initial DevBox Login**
+
+Before enabling the tunnel, you **MUST** log into the DevBox at least once using any client (browser, Windows App, or Remote Desktop client). This step is **mandatory** after each shutdown and restart to establish the required user session.
+
+Once logged in, you can disconnect from the DevBox - you don't need to stay connected.
+
+#### **Step 4: Enable the Tunnel**
+
+1. If you see "No Tunnel" in the description, manually create a tunnel resource first
+2. Click to enable the tunnel
+3. This process takes 1-3 minutes as it:
+   - Installs VS Code on the DevBox (if not already installed)
+   - Sets up the secure tunnel connection
+   - Configures the remote environment
+
+#### **Step 5: Connect to DevBox in VS Code**
+
+Once setup is complete:
+1. Click the **Connect to Tunnel** button
+2. VS Code opens a new window connected to your DevBox
+3. Use **File > Open File/Folder/Workspace** to access DevBox files
+
+### Advanced Features
+
+#### **WSL Integration**
+
+If your DevBox has Windows Subsystem for Linux (WSL) installed:
+
+1. Open the **Remote Explorer** in VS Code
+2. Select **WSL targets** from the dropdown
+3. Connect to any WSL distribution in current or new window
+4. Full Linux development experience within your DevBox
+
+#### **Tunnel Management**
+
+**Viewing Tunnel Status:**
+- Refresh the Dev Box extension explorer view to check tunnel status
+- Monitor connection health and performance
+
+## Enterprise Features and Security
+
+### Conditional Access Policies
+
+Organizations can implement conditional access policies for Dev Tunnels to maintain security and compliance:
+
+#### **Supported Policy Types**
+- **Device Management**: Allow connections only from managed devices
+- **IP Restrictions**: Permit access only from specific IP ranges
+- **Multi-Factor Authentication**: Require additional authentication factors
+- **Standard Conditional Access**: All regular Azure AD conditional access features
+
+## DevBox Tips and Tricks
+
+### Logging and Troubleshooting
+
+#### **WinGet Configuration Customization Logs**
+
+When DevBox applies WinGet Configuration customizations during provisioning, all logs are stored in a centralized location for troubleshooting and audit purposes.
+
+**Log Location:**
+```
+C:\ProgramData\Microsoft\DevBoxAgent\Logs\customizations
+```
+
+**What You'll Find:**
+- **Customization execution logs**: Detailed output from WinGet Configuration runs
+- **Error messages**: Specific failures and their causes
+- **Timing information**: Duration of each customization step
+- **Package installation details**: Success/failure status for each package
+- **DSC resource execution**: PowerShell DSC resource application logs
+
+**Useful PowerShell Commands:**
+```powershell
+# View recent customization logs
+Get-ChildItem "C:\ProgramData\Microsoft\DevBoxAgent\Logs\customizations" -Recurse | 
+    Sort-Object LastWriteTime -Descending | Select-Object -First 10
+
+
+```
+
+### DevBox CLI
+
+#### **Getting Started with DevBox CLI**
+
+The DevBox CLI provides direct access to DevBox functionality from within your development environment.
+
+**Basic Help Command:**
+```bash
+devbox --help
+```
+
+**Output:**
+```
+Description:
+  Welcome to the Dev Box CLI!
+
+   Use `devbox [command] -h` for more information.
+
+Usage:
+  DevBoxCLI [command] [options]
+
+Options:
+  --version       Show version information
+  -?, -h, --help  Show help and usage information
+
+Commands:
+  customizations  Access actions related to dev box customizations
+  metadata        Get metadata from the current dev box
+  ai              Access actions related to dev box integrated AI services commands
+  gpu             Access actions related to dev box serverless gpus.
+```
+
+#### **DevBox Metadata**
+
+Get comprehensive information about your current DevBox environment:
+
+```bash
+devbox metadata get list-all
+```
+
+**Sample Output:**
+```json
+{
+  "devbox-id": "15e84a47-11c1-4855-a057-f0a6fae90684",
+  "devbox-dataplane-id": "a5601606-a045-412d-8d2f-a963e926c82c:contoso-dev-center:psconfeu-dev-project:bf73dcc8-65bb-4f0b-9e1e-22ef58493763:jan-psconfeu-dsc3",
+  "cloudpc-id": "2955a856-f8b0-43e9-bd2a-bda197b76fe7",
+  "cloudpc-device-id": "c7b74fd3-4103-4ffa-81ce-3cd3ddcff8bb",
+  "devcenter-region": "swedencentral",
+  "devcenter-name": "contoso-dev-center",
+  "devbox-region": "swedencentral",
+  "pool-name": "PSConfEU-developer",
+  "devbox-name": "jan-psconfeu-dsc3"
+}
+```
+
+**Useful Metadata Commands:**
+```bash
+# Get specific metadata values
+devbox metadata get devbox-id
+devbox metadata get pool-name
+devbox metadata get devcenter-name
+
+# Get region information
+devbox metadata get devbox-region
+devbox metadata get devcenter-region
+```
+
+#### **Customizations Management**
+
+Manage and monitor DevBox customizations:
+
+```bash
+# View customization commands
+devbox customizations --help
+
+# Check available tasks
+devbox customizations list-tasks
+```
+
+#### **AI Services Integration**
+
+Access DevBox integrated AI services:
+
+```bash
+# View AI service options
+devbox ai --help
+
+# Check AI service status
+devbox ai status
+
+# Configure AI services
+devbox ai deploy-model
+```
+
+### Azure CLI DevCenter Extension
+
+#### **Installation and Setup**
+
+Install the Azure CLI DevCenter extension for comprehensive DevBox management from any environment.
+
+**Installation:**
+```bash
+# Install the DevCenter extension
+az extension add --name devcenter
+```
+
+**Documentation:** [Azure CLI DevCenter Extension](https://learn.microsoft.com/en-us/azure/dev-box/how-to-install-dev-box-cli)
+
+#### **DevCenter CLI Commands**
+
+**Main Command Structure:**
+```bash
+az devcenter --help
+```
+
+**Output:**
+```
+Group
+    az devcenter : Manage resources with devcenter.
+
+Subgroups:
+    admin : Manage devcenter admin resources.
+    dev   : Manage devcenter developer resources.
+```
+
+#### **DevBox Management**
+
+**View DevBox Commands:**
+```bash
+az devcenter dev dev-box --help
+```
+
+**Available Commands:**
+```
+Group
+    az devcenter dev dev-box : Manage dev boxes.
+
+Commands:
+    create     : Create a dev box.
+    delete     : Delete a dev box.
+    list       : List dev boxes.
+    show       : Get a dev box.
+    start      : Start a dev box.
+    stop       : Stop a dev box.
+    restart    : Restart a dev box.
+```
+
+#### **Common DevBox Operations**
+
+**Create a New DevBox:**
+```bash
+az devcenter dev dev-box create \
+    --pool-name "PSConfEU-developer" \
+    --name "MyDevBox" \
+    --dev-center-name "contoso-dev-center" \
+    --project-name "psconfeu-dev-project"
+```
+
+**List All DevBoxes for current user:**
+```bash
+az devcenter dev dev-box list \
+    --dev-center-name "contoso-dev-center"
+```
+
+**Start/Stop DevBox:**
+```bash
+# Start a DevBox
+az devcenter dev dev-box start \
+    --name "MyDevBox" \
+    --dev-center-name "contoso-dev-center" \
+    --project-name "psconfeu-dev-project"
+
+# Stop a DevBox
+az devcenter dev dev-box stop \
+    --name "MyDevBox" \
+    --dev-center-name "contoso-dev-center" \
+    --project-name "psconfeu-dev-project"
+```
+
+**Get DevBox Details:**
+```bash
+az devcenter dev dev-box show \
+    --name "MyDevBox" \
+    --dev-center-name "contoso-dev-center" \
+    --project-name "psconfeu-dev-project"
+```
+
+#### **Environment Management**
+
+**List Available Pools:**
+```bash
+az devcenter dev pool list \
+    --dev-center-name "contoso-dev-center" \
+    --project-name "psconfeu-dev-project"
+```
+
+**List Projects:**
+```bash
+az devcenter dev project list \
+    --dev-center-name "contoso-dev-center"
+```
+
+#### **Advanced CLI Usage**
+
+**Batch Operations with PowerShell:**
+```powershell
+# Get all DevBoxes and their status
+$devboxes = az devcenter dev dev-box list --dev-center-name "contoso-dev-center" --project-name "psconfeu-dev-project" --user-id "bf73dcc8-65bb-4f0b-9e1e-22ef58493763" | ConvertFrom-Json
+
+# Start all hibernated DevBoxes
+$devboxes | Where-Object { $_.powerState -eq "Hibernated" } | ForEach-Object {
+    Write-Host "Starting DevBox: $($_.name)"
+    az devcenter dev dev-box start --name $_.name --dev-center-name "contoso-dev-center" --project-name "psconfeu-dev-project" --user-id "bf73dcc8-65bb-4f0b-9e1e-22ef58493763"
+}
+
+# Stop all running DevBoxes
+$devboxes | Where-Object { $_.actionState -eq "Running" } | ForEach-Object {
+    Write-Host "Stopping DevBox: $($_.name)"
+    az devcenter dev dev-box stop --name $_.name --dev-center-name "contoso-dev-center" --project-name "psconfeu-dev-project" --user-id "bf73dcc8-65bb-4f0b-9e1e-22ef58493763"
+}
+```
+
+**JSON Output Processing:**
+```bash
+# Get DevBox details in JSON format
+az devcenter dev dev-box show \
+    --name "MyDevBox" \
+    --dev-center-name "contoso-dev-center" \
+    --user-id "bf73dcc8-65bb-4f0b-9e1e-22ef58493763" --project-name "psconfeu-dev-project" \
+    --output json | jq '.powerState'
+
+# List DevBoxes with specific fields
+az devcenter dev dev-box list \
+    --dev-center-name "contoso-dev-center" \
+    --project-name "psconfeu-dev-project" \
+    --user-id "bf73dcc8-65bb-4f0b-9e1e-22ef58493763" --output table \
+    --query '[].{Name:name, Status:powerState, Pool:poolName}'
+```
+
+
+#### **Development Workflow Integration**
+
+**Git Configuration Automation:**
+```powershell
+# Auto-configure Git on DevBox startup
+$gitConfig = @"
+[user]
+    name = Your Name
+    email = your.email@company.com
+[core]
+    autocrlf = true
+    editor = code --wait
+[init]
+    defaultBranch = main
+"@
+
+$gitConfig | Out-File -FilePath "$env:USERPROFILE\.gitconfig" -Encoding UTF8
+```
+
+## Learn More
+
+### Official Documentation
+- **[Dev Tunnels Setup Guide](https://learn.microsoft.com/en-us/azure/dev-box/how-to-set-up-dev-tunnels)** - Complete setup instructions
+- **[VS Code Remote Development](https://code.visualstudio.com/docs/remote/remote-overview)** - Remote development concepts
+- **[DevBox Documentation](https://learn.microsoft.com/en-us/azure/dev-box/)** - Complete DevBox service documentation
+
+### Security and Compliance
+- **[Conditional Access for Dev Tunnels](https://learn.microsoft.com/en-us/azure/dev-box/how-to-conditional-access-dev-tunnels-service)** - Enterprise security configuration
+- **[Group Policy Templates](https://learn.microsoft.com/en-us/azure/developer/dev-tunnels/policies)** - Administrative control options
+
+### Advanced Topics
+- **[WSL Development Environment](https://learn.microsoft.com/en-us/windows/wsl/setup/environment)** - Linux development on DevBox
+- **[VS Code Settings Sync](https://code.visualstudio.com/docs/editor/settings-sync)** - Synchronize configurations across environments
+- **[Azure CLI DevCenter Extension](https://learn.microsoft.com/en-us/azure/dev-box/how-to-install-dev-box-cli)** - Command-line DevBox management
+
+#!markdown
+
+## Running Tasks on Existing DevBoxes
+
+### DevBox Customization Tasks
+
+You can run various customization tasks on existing DevBoxes to install software, run scripts, or configure your environment. DevBoxes must be in **Running** state to execute tasks.
+
+#### Available Task Types
+
+Your project supports these customization tasks:
+
+| Task Type | Description | Common Use Cases |
+|-----------|-------------|------------------|
+| **WinGet** | Install packages via WinGet | Install development tools, apps |
+| **PowerShell** | Execute PowerShell commands/scripts | Custom configurations, setup scripts |
+| **Git Clone** | Clone repositories | Download source code, templates |
+| **Chocolatey** | Install Chocolatey packages | Package management |
+| **VS Extensions** | Install Visual Studio extensions | IDE customization |
+
+#### Example: Installing Software via WinGet
+
+```bash
+# Example: Install VS Code via customization task
+# This would be done through the Azure portal or DevBox tools
+```
+
+#### Example: Running PowerShell Commands
+
+```powershell
+# Example PowerShell customization task
+# Install a PowerShell module
+Install-Module -Name Az -Force -AllowClobber
+
+# Configure Git
+git config --global user.name "Your Name"
+git config --global user.email "your.email@example.com"
+```
+
+#### Example: Cloning Repositories
+
+```bash
+# Example: Clone a repository to C:\Workspaces
+# Repository URL: https://github.com/user/repo.git
+# Directory: C:\Workspaces
+# Branch: main
+```
+
+### Task Execution Requirements
+
+**Prerequisites:**
+- DevBox must be **Running** (not hibernated)
+- Appropriate permissions for the task type
+- Valid parameters for the specific task
+
+**Execution Context:**
+- **System Tasks**: Run with administrator privileges
+- **User Tasks**: Run in user context (requires user to be logged in)
+
+### Monitoring Task Progress
+
+Tasks create **customization groups** that you can monitor:
+- View execution status
+- Check logs for debugging
+- Monitor completion progress
+- Review any error messages
+
+#!markdown
+
+### How Tasks Are Triggered Inside the OS
+
+#### DevBox Agent Architecture
+
+DevBox customization tasks are executed through the **DevBox Agent** - a Windows service that runs continuously on every DevBox instance. Here's how the execution flow works:
+
+```mermaid
+graph TB
+    A[Azure DevCenter API] --> B[DevBox Agent Service]
+    B --> C{Task Type?}
+    C -->|System Task| D[Run as SYSTEM]
+    C -->|User Task| E[Wait for User Session]
+    E --> F[Run in User Context]
+    D --> G[Execute PowerShell/WinGet/etc.]
+    F --> G
+    G --> H[Log Results]
+    H --> I[Report Status to Azure]
+```
+
+#### DevBox Agent Service Details
+
+**Service Information:**
+- **Service Name**: `DevBoxAgent` 
+- **Display Name**: Microsoft DevBox Agent
+- **Service Type**: Windows Service (runs as SYSTEM)
+- **Startup Type**: Automatic
+- **Location**: `C:\Program Files\Microsoft\DevBoxAgent\`
+
+#### Task Execution Mechanisms
+
+**1. System Tasks (runAs: System)**
+- Executed immediately by the DevBox Agent service
+- Runs with **SYSTEM** privileges (highest level)
+- Can install software, modify system settings, access all files
+- Does not require user to be logged in
+
+**2. User Tasks (runAs: User)**
+- Requires an active user session to be established
+- Executed in the **user context** with user privileges
+- Triggered when user logs into the DevBox (RDP, browser, etc.)
+- Uses Windows **Task Scheduler** to run in user session
+
+#### Technical Implementation
+
+**Agent Communication:**
+```
+Azure DevCenter → HTTPS → DevBox Agent → Local Execution
+```
+
+**Task Scheduling Method:**
+- **System Tasks**: Direct execution via Windows Service
+- **User Tasks**: Windows Task Scheduler with "Run only when user is logged on"
+
+**Log Storage:**
+- All execution logs stored in: `C:\ProgramData\Microsoft\DevBoxAgent\Logs\`
+- Real-time status updates sent back to Azure DevCenter APIs
+
+#### Behind the Scenes Process
+
+**When you create a customization group:**
+
+1. **API Call**: Azure DevCenter receives the task request
+2. **Agent Notification**: DevBox Agent polls Azure DevCenter for new tasks
+3. **Task Validation**: Agent validates task parameters and prerequisites
+4. **Execution Context**: 
+   - **System tasks**: Execute immediately via service
+   - **User tasks**: Create scheduled task, wait for user login
+5. **Script Generation**: Agent generates PowerShell scripts for execution
+6. **Execution**: Run the actual commands (WinGet, PowerShell, etc.)
+7. **Logging**: Capture all output and errors
+8. **Reporting**: Send status updates back to Azure
+
+#### Agent Configuration
+
+The DevBox Agent can be configured through:
+- **Registry settings**: `HKLM\SOFTWARE\Microsoft\DevBoxAgent`
+- **Configuration files**: Located in agent installation directory
+- **Environment variables**: For debugging and logging levels
+
+#### Monitoring Agent Activity
+
+**Check Agent Status:**
+```powershell
+# Check if DevBox Agent service is running
+Get-Service -Name "DevBoxAgent" | Format-Table Name, Status, StartType
+
+# View recent agent logs
+Get-EventLog -LogName Application -Source "DevBoxAgent" -Newest 10
+```
+
+**Agent Process Details:**
+```powershell
+# Find DevBox Agent processes
+Get-Process | Where-Object { $_.ProcessName -like "*DevBox*" }
+
+# Check agent network connections
+netstat -an | findstr :443  # Agent communicates via HTTPS
+```
+
+This architecture ensures secure, reliable task execution while maintaining proper privilege separation between system and user contexts.

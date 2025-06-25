@@ -1,0 +1,119 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"name":"csharp"},{"name":"fsharp","languageName":"F#","aliases":["f#","fs"]},{"name":"html","languageName":"HTML"},{"name":"http","languageName":"HTTP"},{"name":"javascript","languageName":"JavaScript","aliases":["js"]},{"name":"mermaid","languageName":"Mermaid"},{"name":"pwsh","languageName":"PowerShell","aliases":["powershell"]},{"name":"value"}]}}
+
+#!markdown
+
+# Unleashing the Power of Hybrid Management with PowerShell & Azure Arc
+
+## PSConf EU 2025 - Demo Environment Setup
+
+This notebook demonstrates the setup and capabilities of Azure Arc for hybrid cloud management using PowerShell.
+
+## About Azure Arc Jumpstart ArcBox for IT Pros
+
+Azure Arc Jumpstart ArcBox for IT Pros is a comprehensive sandbox environment designed for IT professionals to explore Azure Arc-enabled servers capabilities. It provides a fully automated, self-contained Azure Arc lab environment that can be deployed with a single click.
+
+### Key Features:
+- **Sandbox Environment**: Perfect for hands-on experience with Azure Arc technologies
+- **Mixed Infrastructure**: Includes both Microsoft Windows and Linux servers
+- **Integrated Management**: Features Azure Monitor, Microsoft Defender for Cloud, Azure Policy, and Update Management
+- **Demo Ready**: Ideal for customer presentations, training, and proof-of-concepts
+- **Rapid Deployment**: Fully automated setup process
+
+### Architecture Overview
+
+![ArcBox IT Pro Architecture](https://raw.githubusercontent.com/Azure/arc_jumpstart_docs/main/docs/azure_jumpstart_arcbox/ITPro/arch_itpro.png)
+
+The ArcBox IT Pro flavor provides a complete hybrid cloud management scenario with Azure Arc-enabled servers, allowing you to experience the full spectrum of Azure management capabilities extended to on-premises and multi-cloud environments.
+
+More information: [Azure Arc Jumpstart ArcBox IT Pro](https://jumpstart.azure.com/azure_jumpstart_arcbox/ITPro)
+
+#!pwsh
+
+# Setup deployment variables
+$RGname = "arcbox-psconfeu-rg"
+$Location = "swedencentral"
+$TemplateFile = ".\azure_arc\azure_jumpstart_arcbox\bicep\main.bicep"
+$TemplateParameterFile = ".\arcbox-lab.bicepparam"
+
+#!pwsh
+
+# Navigate to demo directory
+Set-Location C:\Demo\ArcBox
+Get-Location
+
+#!pwsh
+
+# Clone the Azure Arc repository
+git clone --depth 1 https://github.com/microsoft/azure_arc.git
+
+#!pwsh
+
+# Create the resource group for ArcBox deployment
+New-AzResourceGroup -Name $RGname -Location $Location -Verbose
+
+#!pwsh
+
+# Deploy ArcBox IT Pro environment
+New-AzResourceGroupDeployment -Name arcbox -ResourceGroupName $RGname -TemplateFile $TemplateFile -TemplateParameterFile $TemplateParameterFile -Verbose
+
+#!pwsh
+
+# Open ArcBox IT Pro documentation
+Start-Process "https://jumpstart.azure.com/azure_jumpstart_arcbox/ITPro"
+
+#!markdown
+
+## Presentation Outline
+
+This presentation will cover the following topics and scenarios:
+
+### 1. Introduction to Azure Arc
+- Overview of hybrid and multi-cloud management challenges
+- How Azure Arc extends Azure services and management to any infrastructure
+- Key benefits and use cases
+
+### 2. Brief Introduction to Jumpstart and ArcBox
+- What is Azure Arc Jumpstart?
+- ArcBox overview and different flavors
+- ArcBox for IT Pros capabilities and features
+
+### 3. Scenario: Interactive Execution of PowerShell on Arc-enabled Servers
+Demonstrating various methods to interactively execute PowerShell code on Arc-enabled servers:
+
+#### 3.1 Custom Script Extension
+- Deploying and executing scripts using Azure VM extensions
+- Managing script execution across multiple servers
+- Monitoring script execution results
+
+#### 3.2 Run Command Feature
+- Using Azure's Run Command to execute PowerShell scripts
+- One-time script execution scenarios
+- Viewing command output and results
+
+#### 3.3 PowerShell Remoting via SSH
+- Setting up SSH connections to Arc-enabled servers
+- Running PowerShell commands remotely through SSH
+- Benefits and use cases for SSH-based remoting
+
+#### 3.2 VS Code Remote SSH Extension
+- Connecting to Arc-enabled servers using VS Code Remote SSH
+- Live coding and debugging on remote servers
+- Integration with GitHub Copilot for enhanced development experience
+
+### 4. Scenario: At-Scale Execution of PowerShell on Arc-enabled Servers
+Demonstrating enterprise-scale automation and management:
+
+#### 4.1 Azure Automation - Hybrid Workers
+- Setting up Hybrid Runbook Workers on Arc-enabled servers
+- Executing runbooks at scale across hybrid infrastructure
+- Scheduling and managing automated tasks
+- Integration with Azure Monitor for automated remediations
+
+#### 4.2 Machine Configuration (PowerShell DSC)
+- Implementing desired state configuration using Azure Machine Configuration
+- Compliance monitoring and drift detection
+- Automated remediation of configuration drift
+
+Each scenario will include live demonstrations, best practices, and real-world use cases to showcase the power of PowerShell and Azure Arc for hybrid cloud management.

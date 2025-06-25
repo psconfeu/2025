@@ -1,0 +1,173 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"name":"csharp"},{"name":"fsharp","languageName":"F#","aliases":["f#","fs"]},{"name":"html","languageName":"HTML"},{"name":"http","languageName":"HTTP"},{"name":"javascript","languageName":"JavaScript","aliases":["js"]},{"name":"mermaid","languageName":"Mermaid"},{"name":"pwsh","languageName":"PowerShell","aliases":["powershell"]},{"name":"value"}]}}
+
+#!markdown
+
+# Microsoft DevBox Team Customizations
+
+## Overview
+
+Microsoft DevBox team customizations provide a powerful way to streamline the setup of cloud-based development environments for development teams. Getting developers started on a new project or with a new team is often complex and time-consuming. With team customizations, platform engineering teams and project leads can configure ready-to-code workstations with applications, tools, repositories, code libraries, packages, and build scripts.
+
+## What are Team Customizations?
+
+Team customizations are YAML-based configuration files that define a shared DevBox configuration for development teams without requiring investment in complex imaging solutions like Packer or Azure VM image templates. They provide a lightweight alternative that allows central platform engineering teams to delegate DevBox configuration management to the teams that use them.
+
+### Key Benefits
+
+- **Streamlined Setup**: Eliminate manual developer setup processes
+- **Consistency**: Ensure all team members have identical development environments  
+- **Security**: Enforce organizational security policies across all dev boxes
+- **Efficiency**: Reduce time-to-productivity for new team members
+- **Optimization**: Built-in capability to flatten customizations into custom images
+
+## Team Customizations vs User Customizations
+
+| Feature | Team Customizations | User Customizations |
+|---------|-------------------|-------------------|
+| **Configure on** | Dev box pool | Individual dev box |
+| **Applies to** | All dev boxes in pool | Individual dev box only |
+| **Easily shareable** | Yes | No |
+| **File name** | `imagedefinition.yaml` | `myfilename.yaml` or `workload.yaml` |
+| **Sourced from** | Catalog | Uploaded or personal repository |
+| **Key vault secrets** | Yes | Yes |
+
+## How Team Customizations Work
+
+Team customizations use a YAML-formatted file called an **image definition** that specifies a list of tasks to apply when developers create a dev box. These tasks can:
+
+1. Install necessary tools and applications
+2. Configure development environments
+3. Clone repositories
+4. Set up build scripts and dependencies
+5. Apply security configurations
+
+### Tasks and Components
+
+**Tasks** are wrappers for PowerShell scripts that define reusable components. There are two types:
+
+- **Built-in tasks**: WinGet and PowerShell tasks provided by the platform (start with `~/`)
+- **Custom tasks**: Created and managed through catalogs hosted in Azure Repos or GitHub
+
+Tasks can run in either:
+- **System context**: For administrative operations
+- **User context**: After user sign-in for user-specific configurations
+
+## Configuration Process
+
+### Prerequisites
+
+To implement team customizations, you need:
+
+1. A dev center with existing dev box definition and network connection
+2. Project-level catalogs enabled
+3. Appropriate permissions (Platform Engineer, Project Admin, or Contributor)
+4. A team customization file (`imagedefinition.yaml`)
+
+### Step-by-Step Setup
+
+#### 1. Configure Your Dev Center
+- Enable project-level catalogs
+- Assign permissions for project administrators
+
+#### 2. Choose Catalog Strategy
+**Option A: Built-in Tasks**
+- Use PowerShell or WinGet built-in tasks (recommended for beginners)
+- Start with tasks prefixed with `~/`
+
+**Option B: Custom Catalog**
+- Host in Azure Repos or GitHub
+- Add custom tasks
+- Attach to dev center
+
+#### 3. Create Image Definition File
+Create a YAML file named `imagedefinition.yaml` with your team's customizations:
+
+```yaml
+# Example structure
+name: MyTeamDevBox
+tasks:
+  - name: install-visual-studio
+    runAs: system
+    inputs:
+      edition: Enterprise
+  - name: configure-git
+    runAs: user
+    inputs:
+      username: ${{ secrets.GIT_USERNAME }}
+```
+
+#### 4. Configure Dev Box Pool
+- Create or modify a dev box pool
+- Specify `imagedefinition.yaml` as the image definition
+
+#### 5. Choose Deployment Strategy
+**Option A: Runtime Application**
+- Tasks run during every dev box creation
+- More flexible but slower provisioning
+
+**Option B: Image Optimization**
+- Build customizations into a reusable custom image
+- Faster provisioning for subsequent dev boxes
+
+### Image Optimization Process
+
+For optimal performance, you can build a reusable image:
+
+1. **Configure Permissions**: Assign DevCenter service appropriate roles (Storage Account Contributor, Storage Blob Data Contributor, Reader)
+2. **Build Image**: DevCenter creates a temporary dev box, applies customizations, and exports to Azure Compute Gallery
+3. **Automatic Updates**: New dev boxes automatically use the optimized image
+
+## Security and Permissions
+
+### Required Permissions
+
+| Action | Permission/Role |
+|--------|----------------|
+| Enable project-level catalogs | Platform engineer with subscription write access |
+| Enable catalog sync settings | Platform engineer with subscription write access |
+| Attach catalog to project | Project Admin or Contributor |
+| Create customization file | None (anyone can create) |
+| Use developer portal | Dev Box User |
+| Add tasks to catalog | Repository permissions |
+
+### Security Features
+
+- **Key Vault Integration**: Use Azure Key Vault secrets for secure credential management
+- **Context Isolation**: System vs user context execution prevents privilege escalation
+- **Catalog Approval**: Custom tasks require pre-approval through catalogs
+- **Network Security**: Custom network connections for accessing private resources
+
+## Best Practices
+
+1. **Start Simple**: Begin with built-in tasks before creating custom ones
+2. **Version Control**: Store customization files in version control systems
+3. **Test Thoroughly**: Validate customizations before applying to production pools
+4. **Document Dependencies**: Clearly document any external dependencies
+5. **Monitor Performance**: Track build times and optimize accordingly
+6. **Security First**: Use Key Vault for all sensitive information
+7. **Team Collaboration**: Involve development teams in customization design
+
+## Getting Started
+
+1. **Download Examples**: Start with [official example YAML files](https://aka.ms/devcenter/preview/imaging/examples)
+2. **Enable Features**: Configure your dev center for project-level catalogs
+3. **Create Definition**: Write your first `imagedefinition.yaml`
+4. **Test and Iterate**: Create test dev boxes and refine configurations
+5. **Optimize**: Build custom images for production use
+
+## Current Status
+
+Microsoft DevBox team customizations are now **Generally Available**. Features include:
+
+- VS Code extension with GitHub Copilot chat integration for customization file creation
+- CLI support for debugging PowerShell and WinGet tasks
+- Custom timeout configurations for long-running scripts
+- Region selection optimization based on user location
+
+With the Dev Box VS Code extension, you can open your repo in VS Code, launch agent mode, and simply say, “Help me configure a dev box for this repo.” GitHub Copilot scans the code, understands the app stack, and generates a complete YAML file. If you need to customize the setup, just ask Copilot to add the additional tools, libraries, and settings you need. Copilot updates the YAML file in real-time, and once you’re satisfied, you can validate and apply these updates directly to the team’s configuration. This streamlined process ensures every developer gets an environment tailored to their specific project while eliminating manual work for dev leads.
+
+Team customizations represent a significant step forward in developer productivity, providing infrastructure-as-code capabilities specifically designed for development environment management.
+
+Check out the breakout session from Microsoft Build 2025 ,[Unleash developer potential with AI and Dev Box](https://www.youtube.com/watch?v=TaPAlEkBSVQ), the [public roadmap](https://aka.ms/devbox/roadmap), or [try Dev Box](https://aka.ms/devbox/GetStarted) out with your teams today.
