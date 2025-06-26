@@ -1,0 +1,1 @@
+﻿New-PSUComputerGroup -Name "Windows" -Tags @('Windows')
