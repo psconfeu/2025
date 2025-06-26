@@ -1,5 +1,5 @@
 ﻿Import-Module ScriptTools -Force
-
+<#
 psedit (Get-Module ScriptTools).Path
 
 cd C:\Users\soost\OneDrive\PS\PSConfEU
@@ -7,6 +7,8 @@ cd C:\Users\soost\OneDrive\PS\PSConfEU
 $psISE.CurrentPowerShellTab.Files.RemoveAt(0)
 
 cls
+#>
+return
 ###########################################################################
 #
 #region Search-Property
