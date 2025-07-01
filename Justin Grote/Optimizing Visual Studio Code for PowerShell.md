@@ -1,0 +1,1 @@
+https://github.com/JustinGrote/PSConfEU2025/blob/main/VSCodePowerShell2025.pptx
