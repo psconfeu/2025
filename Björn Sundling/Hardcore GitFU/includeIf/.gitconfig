@@ -1,0 +1,13 @@
+[user]
+	email = bjorn.sundling@gmail.com
+	name = Björn Sundling
+	signingkey = C:\\Users\\Björn\\.ssh\\id_ed25519.pub
+[gpg]
+	format = ssh
+[gpg "ssh"]
+	allowedSignersFile = ~/.ssh/allowed_signers
+[commit]
+	gpgsign = true
+
+[includeIf "gitdir:~/GitHub/work/"]
+    path = .gitconfig.work
