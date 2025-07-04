@@ -1,0 +1,1 @@
+In this scenario's example, `helperScriptTrusted.ps1` is trusted and allowed by policy whereas `MainScriptUntrusted.ps1` is not trusted as no file policy was set to allow this file.

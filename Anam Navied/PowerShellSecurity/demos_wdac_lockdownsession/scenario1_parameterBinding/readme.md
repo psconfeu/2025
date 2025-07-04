@@ -1,0 +1,1 @@
+In this scenario's example, both `demo.ps1` and `demo_betterPractice.ps1` are trusted and allowed by policy.
