@@ -1,0 +1,5 @@
+These demos are run in a default powershell session in default Windows. I have no Application Control lockdown policies set.
+
+I run the following to set the language mode to ConstrainedLanguage mode:
+
+$ExecutionContext.SessionState.LanguageMode = "ConstrainedLanguage"

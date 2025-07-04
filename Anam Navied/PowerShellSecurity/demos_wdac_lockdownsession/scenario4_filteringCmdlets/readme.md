@@ -1,0 +1,1 @@
+In this scenario's example, `helperFunctions.psm1` and `helperFunctions_betterPractice.psm1` are trusted and allowed by policy.
