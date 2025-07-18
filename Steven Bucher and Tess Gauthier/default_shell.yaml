@@ -1,0 +1,10 @@
+$schema: https://aka.ms/dsc/schemas/v3/bundled/config/document.json
+metadata:
+  Microsoft.DSC:
+    securityContext: elevated
+contentVersion: 1.2.3
+resources:
+- name: sshdconfig
+  type: Microsoft.Windows.OpenSSH/SSHD
+  properties:
+    shell: C:\progra~1\powershell\7\pwsh.exe

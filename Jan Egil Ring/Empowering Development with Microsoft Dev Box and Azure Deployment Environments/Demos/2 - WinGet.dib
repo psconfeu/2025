@@ -1,0 +1,228 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"name":"csharp"},{"name":"fsharp","languageName":"F#","aliases":["f#","fs"]},{"name":"html","languageName":"HTML"},{"name":"http","languageName":"HTTP"},{"name":"javascript","languageName":"JavaScript","aliases":["js"]},{"name":"mermaid","languageName":"Mermaid"},{"name":"pwsh","languageName":"PowerShell","aliases":["powershell"]},{"name":"value"}]}}
+
+#!markdown
+
+# WinGet - Windows Package Manager
+
+Windows Package Manager (WinGet) is a comprehensive package manager solution that includes command-line tools, packaging services, and configuration capabilities for Windows systems. This notebook demonstrates various WinGet features and usage patterns.
+
+## Basic WinGet Commands
+
+#!pwsh
+
+# Search for packages
+winget search AzureCLI
+
+#!pwsh
+
+# Install packages
+winget install Microsoft.AzureCLI
+
+#!pwsh
+
+winget install Microsoft.Sysinternals.RDCMan
+
+#!markdown
+
+## Alternative: Using Microsoft.WinGet.Client PowerShell Module
+
+The Microsoft.WinGet.Client PowerShell module provides a native PowerShell interface to WinGet functionality, offering better integration with PowerShell scripts and workflows compared to calling the winget.exe CLI directly.
+
+#!pwsh
+
+# Using Microsoft.WinGet.Client PowerShell Module
+# Install the module from PowerShell Gallery (if not already installed)
+# Install-Module -Name Microsoft.WinGet.Client -Force -Repository PSGallery
+
+# Search for packages
+Find-WinGetPackage -Name "Remote Desktop Connection Manager"
+
+# Get detailed information about a specific package
+# Get-WinGetPackage -Id "Microsoft.Sysinternals.RDCMan"
+
+# Install a package using the PowerShell module
+# Install-WinGetPackage -Id "Microsoft.Sysinternals.RDCMan" -Force
+
+# List all installed packages
+# Get-WinGetPackage | Where-Object { $_.Source -eq "winget" } | Select-Object Name, Id, Version
+
+# Update a specific package
+# Update-WinGetPackage -Id "Microsoft.Sysinternals.RDCMan"
+
+# Uninstall a package
+# Uninstall-WinGetPackage -Id "Microsoft.Sysinternals.RDCMan"
+
+#!markdown
+
+## WinGet Configuration
+
+WinGet Configuration provides a powerful approach to automate machine setup and project onboarding using the Windows Package Manager. By consolidating manual setup processes into a single, reliable, and repeatable command, WinGet Configuration leverages YAML-formatted files and PowerShell Desired State Configuration (DSC) to achieve the desired state of your development environment.
+
+### What is WinGet Configuration?
+
+WinGet Configuration uses three core components:
+
+1. **YAML-formatted Configuration File**: Lists all software versions, packages, tools, dependencies, and settings required for your development environment
+2. **PowerShell Desired State Configuration (DSC)**: Automates the configuration of your Windows operating system
+3. **`winget configure` Command**: Initiates the entire configuration process
+
+### Key Benefits
+
+**Unattended Setup**
+- Execute `winget configure` and let automation handle the rest
+- Windows Package Manager and PowerShell DSC install and configure all requirements
+- Achieves desired development environment state without manual intervention
+
+**Reliable and Repeatable**
+- Eliminates concerns about finding correct software versions
+- Pre-defines packages, tools, frameworks, and machine settings in YAML format
+- Consistent results across different machines and team members
+
+**Open Source Collaboration**
+- Configuration files can be hosted in GitHub repositories
+- Support for issue tracking and community contributions
+- Can be kept private in secure storage locations (OneDrive, etc.)
+- Shareable via private email or secured channels
+
+### How WinGet Configuration Works
+
+**Declarative Approach**
+WinGet Configuration files are declarative rather than imperative, defining the desired machine configuration state result rather than a sequence of steps to follow.
+
+**Processing Flow**
+1. **Parse**: WinGet validates the configuration file format
+2. **Download**: Required PowerShell modules (containing DSC resources) are downloaded
+3. **Verify**: User confirms trustworthiness of the configuration file
+4. **Test**: All required assertions are tested
+5. **Apply**: Desired state is applied to the system
+
+**Non-Sequential Execution**
+- Resource order in the file is inconsequential
+- Some processes may run in parallel
+- Dependencies are managed through assertions and `dependsOn` fields
+- Configuration continues even if some tasks fail, maximizing successful completions
+
+### Configuration File Structure
+
+**Schema Declaration**
+```yaml
+# yaml-language-server: $schema=https://aka.ms/configuration-dsc-schema/0.2
+```
+
+**Core Components**
+- **Properties**: Root node containing configuration version
+- **Assertions**: Prerequisites required for the configuration
+- **Resources**: Installation and configuration tasks
+
+**Resource Format**
+```yaml
+resources:
+  - resource: ModuleName/DscResource
+    directives:
+      description: "Task description"
+    settings:
+      # Configuration parameters
+```
+
+### Assertions and Dependencies
+
+**Assertions**
+- Define preconditions required for configuration
+- Checked before dependent resources execute
+- Failed assertions prevent dependent resources from running
+- Configuration continues with other non-dependent tasks
+
+**Example Dependency Chain**
+```
+Assert:: OsVersion (fails)
+Apply :: DeveloperMode (skipped - depends on OsVersion)
+Apply :: WinGetPackage (skipped - depends on OsVersion)
+Apply :: OtherTask (continues - no dependency)
+```
+
+### Prerequisites and Installation
+
+**Requirements**
+- Windows 10 RS5 or later, or Windows 11
+- WinGet version v1.6.2631 or later
+- PowerShell 7.2 or higher (for DSC resources)
+
+**Installation Methods**
+
+**File Explorer Integration**
+- Double-click configuration files to run automatically
+- No command line required for basic execution
+
+### Integration with Other Tools
+
+WinGet Configuration integrates seamlessly with:
+- **Microsoft Dev Box**: For development environment provisioning
+- **Azure Machine Configuration**: For cloud environment management
+- **PowerShell Gallery**: Access to hundreds of DSC resource modules
+
+### Common Use Cases
+
+**Developer Onboarding**
+- Install development tools (Visual Studio, Git, Node.js)
+- Configure environment variables and settings
+- Set up project-specific dependencies
+
+**Team Standardization**
+- Ensure consistent tool versions across team members
+- Apply organizational security policies
+- Configure shared development standards
+
+**Project Setup**
+- Install project-specific frameworks and libraries
+- Configure build tools and compilation environments
+- Set up testing and deployment tools
+
+### Finding Resources
+
+**Sample Configurations**
+- Official samples: https://aka.ms/dsc.yaml
+- Community examples in WinGet DSC repository
+- PowerShell Gallery for DSC resource modules
+
+### Best Practices
+
+1. **Start Simple**: Begin with basic configurations and expand gradually
+2. **Test Thoroughly**: Always test in isolated environments first
+3. **Version Control**: Store configuration files in source control
+4. **Document Dependencies**: Clearly document prerequisites and assumptions
+5. **Security First**: Validate all external resources and dependencies
+6. **Incremental Development**: Add resources to bottom of file (order doesn't matter)
+7. **Error Handling**: Plan for partial failures and recovery scenarios
+
+WinGet Configuration represents a significant advancement in Windows environment automation, providing infrastructure-as-code capabilities specifically designed for development machine management and team standardization.
+
+#!markdown
+
+### Usage Examples
+
+**Command Line Execution**
+
+#!pwsh
+
+# Run configuration file (run from Windows Terminal)
+winget configure -f C:\repos\demos\0-devbox\examples\config.yml
+
+#!pwsh
+
+# Run with verbose logging
+winget configure -f config.yaml --verbose
+
+#!pwsh
+
+# Disable interactive prompts
+winget configure -f config.yaml --disable-interactivity
+
+#!markdown
+
+## Arc Jumpstart examples
+
+#!pwsh
+
+dir .\0-devbox\examples\arc_jumpstart_winget_configuration

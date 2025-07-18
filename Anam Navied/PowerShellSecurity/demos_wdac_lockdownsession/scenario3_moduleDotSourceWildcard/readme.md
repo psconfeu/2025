@@ -1,0 +1,1 @@
+In this scenario's example, `DotSourceFileNoWildCard_System32.ps1` and `ModuleDotSourceWildcard_System32.psm1` are trusted and allowed by policy.

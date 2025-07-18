@@ -1,0 +1,3 @@
+Import-Module -Name .\helperFunctions.psm1 -Force 2> $null
+
+# show loaded functions, add filter, show again

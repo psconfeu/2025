@@ -1,0 +1,1 @@
+﻿Get-Process | Select Name, Id, CommandLine

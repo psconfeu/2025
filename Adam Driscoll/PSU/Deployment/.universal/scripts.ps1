@@ -1,0 +1,1 @@
+New-PSUScript -Module 'PowerShellUniversal.Malmo' -Command "Invoke-MalmoCommand" -Description 'A module for interacting with the Malmo platform.' 

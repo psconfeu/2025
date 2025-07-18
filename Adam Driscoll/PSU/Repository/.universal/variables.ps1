@@ -1,0 +1,1 @@
+﻿New-PSUVariable -Name "Giphy" -Vault "Database"

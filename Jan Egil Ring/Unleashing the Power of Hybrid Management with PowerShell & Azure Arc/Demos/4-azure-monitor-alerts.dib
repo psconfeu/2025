@@ -1,0 +1,208 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"name":"csharp"},{"name":"fsharp","languageName":"F#","aliases":["f#","fs"]},{"name":"html","languageName":"HTML"},{"name":"http","languageName":"HTTP"},{"name":"javascript","languageName":"JavaScript","aliases":["js"]},{"name":"mermaid","languageName":"Mermaid"},{"name":"pwsh","languageName":"PowerShell","aliases":["powershell"]},{"name":"value"}]}}
+
+#!markdown
+
+# Azure Monitor Baseline Alerts (AMBA)
+
+## Overview
+
+**Azure Monitor Baseline Alerts (AMBA)** is a central repository that combines product group and field experience driven alert definitions, enabling organizations to improve their observability experience through the adoption of Azure Monitor at scale.
+
+### Key Benefits of AMBA:
+
+🎯 **Consistent Alerting** - Standardized alert definitions across all Azure resources  
+📊 **Scale-ready** - Policy-driven deployment using DeployIfNotExists effects  
+🏗️ **Landing Zone Integration** - Built into Azure Landing Zone installation experience  
+⚡ **Resource-specific** - Organized by resource type for easy identification  
+🔧 **Flexible Framework** - Extensible for custom alert development  
+
+### AMBA Components:
+
+- **Service Health Alerts** - Platform-wide health notifications
+- **Compute Resources** - VMs, Azure Arc-enabled servers, App Services
+- **Networking Resources** - VNet, ExpressRoute, Firewall, Virtual WAN
+- **Storage & Data** - Storage Accounts, Key Vault, Log Analytics
+- **Custom Deployments** - ARM, Bicep, and Policy definitions
+
+*Source: [Create alert rules for Azure resources - Microsoft Learn](https://learn.microsoft.com/en-us/azure/azure-monitor/alerts/alert-options)*
+
+#!markdown
+
+## AMBA Integration with Azure Landing Zones
+
+Azure Monitor Baseline Alerts is **fully integrated** with Azure Landing Zones (ALZ), providing **policy-driven governance** for consistent monitoring and alerting across your entire Azure estate.
+
+### Architecture Overview
+
+![AMBA Azure Landing Zones Integration](https://azure.github.io/azure-monitor-baseline-alerts/patterns/alz/media/alz-management-groups.png)
+
+*Architecture diagram showing how AMBA policy initiatives are applied across Azure Landing Zone management groups*
+
+### Policy Initiative Distribution:
+
+🏢 **Platform Management Groups**:
+- **Connectivity** - ExpressRoute, VNet Gateway, Firewall alerts
+- **Identity** - Key Vault, identity-related service alerts  
+- **Management** - Log Analytics, Automation Account alerts
+
+🏗️ **Landing Zones Management Group**:
+- **Workload-specific alerts** - Application and service alerts
+- **Resource monitoring** - VMs, storage, databases
+
+🌐 **Intermediate Root Management Group**:
+- **Service Health Initiatives** - Platform-wide health notifications
+- **Notification Assets** - Centralized action groups and alert processing
+
+### Benefits of ALZ Integration:
+
+✅ **Automatic Deployment** - Alerts deployed when resources are created  
+✅ **Consistent Standards** - Organization-wide monitoring baselines  
+✅ **Policy-driven Governance** - DeployIfNotExists ensures compliance  
+✅ **Scalable Architecture** - Supports enterprise-scale deployments  
+✅ **Cost Optimization** - Only deploys alerts for existing resources
+
+*Source: [Monitor Azure platform landing zone components - Microsoft Learn](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/landing-zone/design-area/management-monitor)*
+
+#!markdown
+
+## 🔥 HybridCompute Policy Initiative - Arc-enabled Servers Focus
+
+### Critical Monitoring for Hybrid Infrastructure
+
+The **HybridCompute policy initiative** is specifically designed for **Azure Arc-enabled servers**, providing comprehensive monitoring capabilities for your hybrid and multi-cloud infrastructure.
+
+#### Key Features for Arc-enabled Servers:
+
+🖥️ **Server Health Monitoring**:
+- **CPU Utilization** - Percentage thresholds and trending
+- **Memory Usage** - Available memory and memory pressure alerts
+- **Disk Space** - Free disk space and disk performance metrics
+- **Network Connectivity** - Connection status and bandwidth utilization
+
+🔍 **Arc-specific Alerts**:
+- **Agent Health** - Azure Connected Machine Agent status monitoring
+- **Extension Status** - VM extension deployment and health
+- **Resource Management** - Resource provider registration and connectivity
+- **Compliance Monitoring** - Policy compliance and drift detection
+
+🛡️ **Security & Governance**:
+- **Security Baseline Compliance** - Windows and Linux security configurations
+- **Update Management** - Missing updates and patch compliance
+- **Configuration Drift** - Desired State Configuration monitoring
+- **Access Control** - Identity and access management alerts
+
+#### Policy Initiative Benefits:
+
+| Feature | Traditional Monitoring | AMBA HybridCompute Initiative |
+|---------|----------------------|-------------------------------|
+| **Deployment** | Manual per server | Automated via Policy |
+| **Consistency** | Varies by implementation | Standardized across estate |
+| **Scale** | Limited | Enterprise-ready |
+| **Maintenance** | High operational overhead | Self-managing |
+| **Cost** | Pay for all alerts | Pay only for active resources |
+
+### Arc-enabled Servers Integration Points:
+
+🔗 **Azure Policy** - Automatic deployment and compliance enforcement  
+🔗 **Azure Monitor** - Centralized metrics and log collection  
+🔗 **Microsoft Defender for Cloud** - Security posture management  
+🔗 **Azure Automation** - Update management and configuration  
+🔗 **Log Analytics** - Centralized logging and query capabilities
+
+*This initiative ensures your hybrid infrastructure receives the same level of monitoring and alerting as native Azure resources.*
+
+#!markdown
+
+## Implementation Approach
+
+### Policy-Driven Deployment Strategy
+
+AMBA leverages **Azure Policy's DeployIfNotExists** effect to ensure consistent alerting across your hybrid infrastructure:
+
+1. **Resource Detection** - Policy evaluates resource creation/updates
+2. **Automatic Deployment** - Alert rules deployed when Arc-enabled servers are onboarded
+3. **Compliance Monitoring** - Continuous assessment of alert rule presence
+4. **Remediation Tasks** - Automatic correction of non-compliant resources
+
+### Enterprise Benefits:
+
+🏢 **Governance** - Centralized policy management and compliance reporting  
+⚡ **Automation** - Zero-touch deployment of monitoring capabilities  
+📊 **Standardization** - Consistent alerting thresholds across all environments  
+💰 **Cost Control** - Pay only for resources that exist and need monitoring  
+🔧 **Maintenance** - Self-healing infrastructure with automatic remediation
+
+---
+
+## Demo: AMBA HybridCompute Implementation
+
+The following demonstration shows how to deploy Azure Monitor Baseline Alerts specifically for **Azure Arc-enabled servers** using the HybridCompute policy definitions.
+
+### Repository Structure:
+```
+azure-monitor-baseline-alerts/
+├── services/
+│   ├── HybridCompute/
+│   │   └── machines/           ← Arc-enabled servers alerts
+│   ├── Compute/
+│   ├── Network/
+│   └── Storage/
+```
+
+### What You'll See:
+- 🔍 **Policy Definition Creation** - Converting AMBA templates to Azure Policy
+- 🎯 **Resource Group Assignment** - Scoping policies to Arc-enabled servers
+- 📋 **Alert Rule Deployment** - Automatic monitoring setup
+- 🚨 **Compliance Verification** - Ensuring all servers are monitored
+
+*Let's implement enterprise-grade monitoring for our hybrid infrastructure...*
+
+#!pwsh
+
+# https://github.com/Azure/azure-monitor-baseline-alerts/tree/main/services/HybridCompute/machines
+
+git clone https://github.com/Azure/azure-monitor-baseline-alerts.git C:\demo\amba
+
+# Set your variables
+$resourceGroupName = "arcbox-psconfeu-rg"
+$policyDefinitionsPath = "C:\demo\amba\services\HybridCompute\machines"
+$policyDefinitions = Get-ChildItem -Path $policyDefinitionsPath -Filter *.json #| select -First 1
+
+# Loop through each JSON file, create a policy definition and assign it
+foreach ($policyDefinitionFile in $policyDefinitions) {
+    # Read the JSON file content and replace double brackets with single brackets
+    $policyDefinitionContent = Get-Content -Path $policyDefinitionFile.FullName -Raw
+    $policyDefinitionContent = $policyDefinitionContent -replace '\[\[', '[' -replace '\]\]', ']'
+
+    # Convert the modified JSON content to an object
+    $policyDefinitionJson = $policyDefinitionContent | ConvertFrom-Json
+
+    # Use the filename (without extension) as the Policy Definition Name
+    $policyDefinitionName = $policyDefinitionFile.BaseName
+
+    # Temporarily write the modified JSON to a file for use with New-AzPolicyDefinition
+    $tempFilePath = [System.IO.Path]::GetTempFileName()
+    $policyDefinitionJson | ConvertTo-Json -Depth 10 | Out-File -FilePath $tempFilePath
+
+    # Create the Policy Definition
+    try {
+        $policyDefinition = New-AzPolicyDefinition -Name $policyDefinitionName -DisplayName $policyDefinitionJson.properties.displayName `
+            -Policy $tempFilePath -Description $policyDefinitionJson.properties.description -Mode All
+    } catch {
+        Write-Output "Failed to create policy definition for file $($policyDefinitionFile.Name): $($_.Exception.Message)"
+        continue
+    }
+
+    # Assign the Policy Definition to the resource group
+    try {
+        New-AzPolicyAssignment -Name $policyDefinitionName -DisplayName $policyDefinitionJson.properties.displayName `
+            -Scope "/subscriptions/$((Get-AzContext).Subscription.Id)/resourceGroups/$resourceGroupName" -PolicyDefinition $policyDefinition
+    } catch {
+        Write-Output "Failed to assign policy $policyDefinitionName $($_.Exception.Message)"
+    }
+
+    # Clean up the temporary file
+    Remove-Item -Path $tempFilePath -Force
+}

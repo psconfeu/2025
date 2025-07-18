@@ -1,0 +1,1 @@
+Import-Module -Name .\ModuleDotSourceWildcard_System32.psm1 -Force 2> $null

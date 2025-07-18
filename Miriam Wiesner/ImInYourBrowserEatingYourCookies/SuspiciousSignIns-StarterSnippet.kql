@@ -1,0 +1,14 @@
+//KQL Starter Snippet to detect Suspicious Sign In Patterns
+
+SigninLogs
+| where ResultType == 0  // successful sign-in
+| where AuthenticationDetails has "MFA"  // MFA was used
+| summarize 
+    Count = count(), 
+    DistinctIPs = dcount(IPAddress), 
+    DistinctUserAgents = dcount(UserAgent), 
+    FirstSeen = min(TimeGenerated), 
+    LastSeen = max(TimeGenerated)
+    by UserPrincipalName, SessionId, AppDisplayName, AppId, ResourceDisplayName, ResourceIdentity
+| where DistinctIPs > 1 or DistinctUserAgents > 1
+| order by LastSeen desc

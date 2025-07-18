@@ -1,0 +1,23 @@
+TOPIC
+    about_Azure.Arc.Jumpstart.Common
+
+SHORT DESCRIPTION
+    Azure Arc Jumpstart module for common functions
+
+LONG DESCRIPTION
+    Azure Arc Jumpstart module for common functions
+
+EXAMPLES
+    PS C:\> {{ add examples here }}
+
+NOTE:
+    Thank you to all those who contributed to this module, by writing code, sharing opinions, and provided feedback.
+
+TROUBLESHOOTING NOTE:
+    Look out on the Github repository for issues and new releases.
+
+SEE ALSO
+    - https://github.com/Azure/jumpstart-sdk
+
+KEYWORDS
+    Jumpstart

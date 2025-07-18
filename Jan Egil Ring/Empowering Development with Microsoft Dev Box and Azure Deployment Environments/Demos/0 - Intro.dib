@@ -1,0 +1,214 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"name":"csharp"},{"name":"fsharp","languageName":"F#","aliases":["f#","fs"]},{"name":"html","languageName":"HTML"},{"name":"http","languageName":"HTTP"},{"name":"javascript","languageName":"JavaScript","aliases":["js"]},{"name":"mermaid","languageName":"Mermaid"},{"name":"pwsh","languageName":"PowerShell","aliases":["powershell"]},{"name":"value"}]}}
+
+#!markdown
+
+# Configuration-as-Code Customization Overview
+
+## What We'll Cover in This Presentation
+
+This presentation explores the modern approach to development environment management through **Configuration-as-Code** customization, focusing on how Microsoft's ecosystem provides integrated solutions for automated, repeatable, and scalable development environment setup.
+
+### Learning Objectives
+
+By the end of this presentation, you will understand:
+
+1. **End User Experience**: How developers access and use DevBox through various interfaces and AI-powered tools
+2. **Foundation Technologies**: How PowerShell DSC and WinGet Configuration form the technical foundation
+3. **Integration Patterns**: How these technologies integrate to create comprehensive automation solutions
+4. **Microsoft DevBox Implementation**: How DevBox leverages these building blocks for enterprise development environments
+5. **Practical Application**: Real-world scenarios and implementation strategies
+
+### Presentation Structure
+
+#### 💻 **1. DevBox Basics - End User Experience**
+- **What**: The developer's perspective on accessing and using DevBox environments
+- **Access Methods**: Windows App, web portal, and VS Code Dev Tunnels
+- **Developer Portal**: Central hub at https://devportal.microsoft.com/ for self-service
+- **Remote Development**: Seamless VS Code integration with tunnel connections
+- **User Journey**: From discovery to daily development workflow
+- **🤖 AI Integration**: DevBox MCP Server for intelligent management
+  - **Package**: [@microsoft/devbox-mcp](https://www.npmjs.com/package/@microsoft/devbox-mcp)
+  - **Natural Language Operations**: AI-powered DevBox management and automation
+  - **Enhanced Productivity**: Intelligent assistance and troubleshooting
+
+#### 📋 **2. PowerShell DSC (Desired State Configuration)**
+- **What**: Declarative configuration platform for Windows systems
+- **Why**: Provides idempotent, self-healing system configuration
+- **How**: Define desired state using PowerShell syntax and MOF files
+- **DevBox Role**: Serves as the configuration engine for system-level customizations
+
+#### 📦 **3. WinGet Configuration**
+- **What**: YAML-based package management and system configuration
+- **Why**: Simplifies software installation and environment setup
+- **How**: Combines Windows Package Manager with DSC resources
+- **DevBox Role**: Handles application installation and user-level customizations
+
+#### 🏗️ **4. Microsoft DevBox Team Customizations**
+- **What**: Enterprise development environment provisioning platform
+- **Why**: Standardizes and automates dev environment creation for teams
+- **How**: Orchestrates DSC and WinGet through image definitions and catalogs
+- **Business Value**: Reduces onboarding time, ensures consistency, improves security
+
+### The Configuration-as-Code Ecosystem
+
+**Configuration-as-Code** represents a paradigm shift from manual environment setup to automated, version-controlled, and reproducible infrastructure management. In Microsoft's ecosystem, this is achieved through a layered architecture:
+
+**Foundation Layer**: PowerShell DSC provides the core configuration engine  
+**Package Layer**: WinGet Configuration adds software installation and user customization  
+**Orchestration Layer**: Microsoft DevBox integrates everything into enterprise-ready solutions
+
+### Key Benefits
+
+- **Consistency**: Identical environments across all team members
+- **Speed**: Automated setup reduces onboarding from days to hours
+- **Reliability**: Declarative configurations eliminate configuration drift
+- **Scalability**: Team-wide customizations without individual management overhead
+- **Security**: Centralized policy enforcement and secret management
+- **Maintenance**: Version-controlled configurations enable rollback and updates
+
+#!mermaid
+
+## Configuration-as-Code Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                  CONFIGURATION-AS-CODE ECOSYSTEM                    │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────┐
+│                     🏗️  ORCHESTRATION LAYER                        │
+│  ┌─────────────────────────────────────────────────────────────┐    │
+│  │                 Microsoft DevBox                            │    │
+│  │  • Team Customizations    • Image Definitions               │    │
+│  │  • Catalog Management     • Enterprise Integration          │    │
+│  └─────────────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                   📦  PACKAGE MANAGEMENT LAYER                     │
+│  ┌─────────────────────────────────────────────────────────────┐    │
+│  │                 WinGet Configuration                        │    │
+│  │  • Software Installation  • YAML Configurations             │    │
+│  │  • Package Dependencies   • Environment Setup               │    │
+│  └─────────────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                      🔧  FOUNDATION LAYER                          │
+│  ┌─────────────────────────────────────────────────────────────┐    │
+│  │                 PowerShell DSC                              │    │
+│  │  • System Configuration   • Registry Settings               │    │
+│  │  • Windows Features       • Services & Processes            │    │
+│  └─────────────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────┐
+│                    🛠️  SUPPORTING INFRASTRUCTURE                   │
+│                                                                     │
+│  📚 Catalogs           🔐 Azure Key Vault      🖼️ Compute Gallery │
+│  • Azure Repos        • Secrets Management    • Custom Images      │
+│  • GitHub             • Secure Configuration  • Optimized Deploy   │
+│  • Custom Tasks       • Access Control        • Version Control    │
+└─────────────────────────────────────────────────────────────────────┘
+
+                                    │
+                                    ▼
+
+┌─────────────────────────────────────────────────────────────────────┐
+│                      👥  DEVELOPMENT TEAM                          │
+│                                                                     │
+│    👨‍💻 Developer 1    👩‍💻 Developer 2    👨‍💻 Developer 3             │
+│                                                                     │
+│                          ↓ Results in ↓                             │
+│                                                                     │
+│  ✅ Consistent      ⚡ Rapid         🛡️ Security      🔄 Easy     │
+│     Environments      Onboarding       Compliance      Maintenance  │
+└─────────────────────────────────────────────────────────────────────┘
+
+DATA FLOW:
+──────────
+1. 🔧 PowerShell DSC provides system-level configuration foundation
+2. 📦 WinGet Configuration adds package management and user setup
+3. 🏗️ DevBox orchestrates both layers for enterprise deployment
+4. 🛠️ Supporting infrastructure provides security, storage, and reusability
+5. 👥 Development teams get consistent, automated environments
+```
+
+### Key Integration Points
+
+**PowerShell DSC → WinGet Configuration**
+- DSC resources are consumed by WinGet Configuration YAML files
+- System-level configurations enable application installations
+- Shared execution context and dependency management
+
+**WinGet Configuration → Microsoft DevBox**
+- YAML configurations become DevBox image definitions
+- Package management integrates with catalog systems
+- User and system contexts orchestrated together
+
+**Enterprise Integration**
+- Azure Key Vault provides secure secret management
+- Catalogs enable component reusability and governance
+- Compute Gallery optimizes deployment performance
+
+#!markdown
+
+## Architecture Overview
+
+The diagram above illustrates how **Configuration-as-Code** customization works in Microsoft's ecosystem through three key layers:
+
+### 🔧 Foundation Layer: PowerShell DSC
+- **Core Engine**: Provides the fundamental configuration management capabilities
+- **System-Level**: Handles Windows features, registry settings, services, and system configuration
+- **Declarative**: Define "what" the system should look like, not "how" to achieve it
+- **Idempotent**: Can be run multiple times safely with consistent results
+
+### 📦 Package Management Layer: WinGet Configuration
+- **Software Focus**: Specializes in application installation and user environment setup
+- **YAML-Based**: Uses human-readable configuration files
+- **DSC Integration**: Leverages PowerShell DSC resources under the hood
+- **Package Management**: Handles dependencies and software lifecycle
+
+### 🏗️ Orchestration Layer: Microsoft DevBox
+- **Enterprise Integration**: Combines DSC and WinGet into team-ready solutions
+- **Image Definitions**: YAML files that define complete development environments
+- **Catalog System**: Reusable components shared across teams and projects
+- **Security Integration**: Azure Key Vault for secrets, role-based access control
+
+### Supporting Infrastructure
+- **📚 Catalogs**: Store and share reusable configuration components
+- **🔐 Azure Key Vault**: Secure management of secrets and credentials
+- **🖼️ Azure Compute Gallery**: Optimized custom images for faster provisioning
+
+## What Makes This Powerful
+
+1. **Layered Architecture**: Each technology focuses on what it does best
+2. **Seamless Integration**: Technologies work together without conflict
+3. **Enterprise Ready**: Built-in security, scalability, and management features
+4. **Developer Friendly**: Simple YAML syntax hiding complex orchestration
+
+## Presentation Journey
+
+We'll explore each layer through:
+- **Hands-on Examples**: Live code and configuration demonstrations
+- **End User Scenarios**: Developer experience from portal to VS Code
+- **AI Integration**: DevBox MCP Server for intelligent management
+- **Real-world Scenarios**: Practical use cases you can implement immediately
+- **Best Practices**: Lessons learned from enterprise implementations
+- **Integration Patterns**: How to combine technologies effectively
+
+### Developer Experience Focus
+
+This presentation emphasizes the **complete developer journey**:
+
+1. **🔍 Discovery**: Finding and accessing DevBox environments via the developer portal
+2. **🚀 Access**: Multiple connection methods (Windows App, browser, VS Code tunnels)
+3. **🤖 AI Assistance**: Using natural language to manage environments through MCP
+4. **⚙️ Customization**: Understanding how configurations shape the experience
+5. **🔧 Administration**: Behind-the-scenes orchestration and team management
+
+Ready to dive into the world of Configuration-as-Code? Let's start with PowerShell DSC fundamentals! 🚀

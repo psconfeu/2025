@@ -1,0 +1,41 @@
+$schema: https://raw.githubusercontent.com/PowerShell/DSC/main/schemas/2023/08/config/document.json
+metadata:
+  winget:
+    processor: dscv3
+resources:
+  - name: WindowsSettings
+    type: Microsoft.Windows.Settings/WindowsSettings
+    metadata:
+      allowPrerelease: true
+      description: Configure Windows Settings
+    properties:
+      TaskbarAlignment: Left
+      AppColorMode: Dark
+      SystemColorMode: Dark
+      DeveloperMode: true
+  - name: Set desktop background
+    type: DesktopBackgroundDsc/DesktopBackground
+    properties:
+      ImagePath: 'C:\WinGetConfig\psconfeu.png'
+      Ensure: true
+  - name: PowerShell
+    type: Microsoft.WinGet/Package
+    metadata:
+      description: PowerShell 7
+    properties:
+        id: Microsoft.PowerShell
+        source: winget
+  - name: PowerToys
+    type: Microsoft.WinGet/Package
+    metadata:
+      description: PowerToys
+    properties:
+        id: Microsoft.PowerToys
+        source: winget
+  - name: WindowsTerminal
+    type: Microsoft.WinGet/Package
+    metadata:
+      description: Windows Terminal
+    properties:
+        id: Microsoft.WindowsTerminal
+        source: winget

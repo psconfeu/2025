@@ -1,0 +1,198 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"name":"csharp"},{"name":"fsharp","languageName":"F#","aliases":["f#","fs"]},{"name":"html","languageName":"HTML"},{"name":"http","languageName":"HTTP"},{"name":"javascript","languageName":"JavaScript","aliases":["js"]},{"name":"mermaid","languageName":"Mermaid"},{"name":"pwsh","languageName":"PowerShell","aliases":["powershell"]},{"name":"value"}]}}
+
+#!markdown
+
+# Microsoft Desired State Configuration (DSC) v3.0
+
+## Overview
+
+**Microsoft Desired State Configuration (DSC) 3.0** is the latest evolution of Microsoft's configuration management platform that enables you to manage your IT and development infrastructure with **configuration as code**. 
+
+DSC 3.0 represents a significant advancement over previous versions:
+- **True cross-platform support** (Windows, Linux, macOS)
+- **Standalone product** that's not dependent on PowerShell
+- **JSON schemas** for standardized integration with other tools
+- **Modern architecture** designed for cloud-native scenarios
+
+*Source: [Microsoft Desired State Configuration overview - Microsoft Learn](https://learn.microsoft.com/en-us/powershell/dsc/overview?view=dsc-3.0)*
+
+#!markdown
+
+## DSC Versions Available
+
+There are four versions of DSC currently available:
+
+1. **Microsoft DSC 3.0 (3.1 being the latest per June 2025)** - The new version providing true cross-platform support
+2. **PowerShell DSC 3.0 (preview)** - Supported by Azure Machine Configuration on Linux  
+3. **PowerShell DSC 2.0** - Ships with PowerShell 7 (separate module since 7.2)
+4. **PowerShell DSC 1.1** - Legacy version from Windows PowerShell 5.1
+
+*Source: [Desired State Configuration (DSC) Overview - Microsoft Learn](https://learn.microsoft.com/en-us/powershell/scripting/dsc/overview?view=powershell-7.5)*
+
+## Installation
+
+### Install DSC on Windows with WinGet
+```powershell
+# Search for DSC packages
+winget search DesiredStateConfiguration --source msstore
+
+# Install latest stable version
+winget install --id 9NVTPZWRC6KQ --source msstore
+
+# Install latest preview version  
+winget install --id 9PCX3HZ4HZ0Z --source msstore
+```
+
+### Manual Installation
+1. Download the [latest release from PowerShell/DSC repository](https://github.com/PowerShell/DSC/releases/latest)
+2. Expand the release archive
+3. Add the folder to your PATH environment variable
+
+#!markdown
+
+## Integration with Higher-Level Services
+
+DSC 3.0 is designed as a **platform tool that abstracts the concerns** for defining and invoking resources. It serves as the foundation for higher-order orchestration tools and services:
+
+### 🔷 Azure Machine Configuration
+- **Successor to Azure Automation State Configuration** (retiring September 30, 2027)
+- **Hybrid machine support** through Arc-enabled servers
+- **Built-in compliance reporting** and drift detection
+- **Policy-driven** configuration management at scale
+- Supports both **audit** and **remediation** scenarios
+
+### 🔷 Microsoft Dev Box
+- Uses **DSC configuration files** for team customizations
+- Supports **WinGet DSC configurations** for software installations
+- **Image definition files** can reference existing DSC configurations
+- Enables **consistent development environments** across teams
+
+### 🔷 WinGet Configuration
+- Integrates with **WinGet package manager**
+- Uses DSC for **system configuration** beyond package installation
+- Supports **declarative configuration files** in YAML format
+
+*Source: [Microsoft Desired State Configuration overview - Microsoft Learn](https://learn.microsoft.com/powershell/dsc/overview?view=dsc-3.0)*
+
+For inspiration, have a look at known GitHub projects that use a WinGet configuration file that one can use to setup their environment for building the project [: https://github.com/microsoft/winget-dsc](https://github.com/microsoft/winget-dsc/blob/main/samples/GitHubProjects.md)
+
+
+---
+
+## Key Integration Benefits
+
+✅ **Standardized schemas** - JSON schemas enable consistent tool integration  
+✅ **Cross-platform support** - Works across Windows, Linux, and macOS  
+✅ **Policy enforcement** - Azure Machine Configuration provides governance  
+✅ **Development workflow** - Dev Box ensures consistent environments  
+✅ **Hybrid management** - Arc-enabled servers extend to on-premises and multi-cloud
+
+#!markdown
+
+## Azure Machine Configuration
+
+### Migration Path from Legacy DSC Extensions
+
+**Important**: The Azure DSC Extension will be **retired on March 31, 2028**. Organizations should migrate to Azure Machine Configuration, which provides:
+
+- **Enhanced capabilities** combining DSC Extension and Azure Automation State Configuration features
+- **Hybrid support** through Azure Arc-enabled servers  
+- **Improved compliance reporting** and governance
+- **Better integration** with Azure Policy and Azure Resource Manager
+
+### Machine Configuration Deployment
+
+Azure Machine Configuration uses a **two-step deployment process**:
+
+1. **Install the Machine Configuration Extension**
+2. **Create Machine Configuration Assignments**
+
+#### Extension Installation Requirements:
+- Instance name must be `AzurePolicyforWindows` or `AzurePolicyforLinux`
+- `autoUpgradeMinorVersion` should be set to `true`
+- `enableAutomaticUpgrade` property recommended for automatic updates
+
+*Sources: [Azure Machine Configuration extension - Microsoft Learn](https://learn.microsoft.com/en-us/azure/virtual-machines/extensions/guest-configuration) and [Planning a change from DSC extension - Microsoft Learn](https://learn.microsoft.com/en-us/azure/governance/machine-configuration/whats-new/migrating-from-dsc-extension)*
+
+#!markdown
+
+### A glimse into the future: Azure Machine Configuration with Bicep
+
+For **new deployments**, use Azure Machine Configuration. Here's a Bicep example:
+
+#!csharp
+
+// Azure Machine Configuration Assignment with Bicep
+@description('Virtual machine name')
+param vmName string
+
+@description('Configuration name')
+param configurationName string = 'CustomIISConfiguration'
+
+@description('Location for all resources')
+param location string = resourceGroup().location
+
+@description('Configuration package URL')
+param configurationUri string
+
+@description('Configuration package SHA256 hash')
+param configurationHash string
+
+// Install Machine Configuration Extension
+resource machineConfigExtension 'Microsoft.Compute/virtualMachines/extensions@2023-07-01' = {
+  name: '${vmName}/AzurePolicyforWindows'
+  location: location
+  properties: {
+    publisher: 'Microsoft.GuestConfiguration'
+    type: 'ConfigurationforWindows'
+    typeHandlerVersion: '1.0'
+    autoUpgradeMinorVersion: true
+    enableAutomaticUpgrade: true
+    settings: {}
+    protectedSettings: {}
+  }
+}
+
+// Create Machine Configuration Assignment
+resource guestConfigurationAssignment 'Microsoft.GuestConfiguration/guestConfigurationAssignments@2022-01-25' = {
+  name: configurationName
+  scope: resourceId('Microsoft.Compute/virtualMachines', vmName)
+  location: location
+  properties: {
+    guestConfiguration: {
+      name: configurationName
+      contentUri: configurationUri
+      contentHash: configurationHash
+      assignmentType: 'ApplyAndMonitor'
+      version: '1.0.0'
+    }
+  }
+  dependsOn: [
+    machineConfigExtension
+  ]
+}
+
+#!markdown
+
+In the above example, the authoring experience is still based on PowerShell and DSC 2.0 as shown in `5-dsc-configuration-machine-configuration.dib`.
+
+According to the PowerShell team in the [PowerShell Community Call - June 19th, 2025](https://youtu.be/pqS5EKAHTJA?t=434), investments in DSC 3.2 will be support for authoring DSC configuration documents in Bicep.
+
+At some point in the future, this means we will be able to author both Azure Machine Configuration policy defintions and assignments as well as DSC configurations in Bicep - and take advantage of new features in DSC 3.0 such as groups and assertions.
+
+
+## Summary
+
+Microsoft DSC 3.0 represents the **evolution of configuration management** in modern cloud and hybrid scenarios:
+
+🔄 **Evolution Path**: DSC Extension → Azure Machine Configuration  
+🌐 **Integration Points**: Dev Box, WinGet, Azure Policy, Arc-enabled servers  
+📋 **Standards**: JSON schemas enable consistent tool integration  
+🛡️ **Governance**: Policy-driven compliance and drift detection  
+🔧 **Flexibility**: Custom configurations and built-in baselines
+
+**Next Steps**: Explore Azure Machine Configuration for policy-driven configuration management at scale.
+
+*Sources: Multiple Microsoft Learn articles on DSC, Azure Machine Configuration, and Dev Box integration*

@@ -1,0 +1,27 @@
+$schema: "1.0"
+name: "devbox-customization"
+userTasks:
+  - name: winget
+    description: "Install Postman"
+    parameters:
+      package: Postman.Postman
+  - name: git-clone
+    parameters:
+      repositoryUrl: https://github.com/psconfeu/2025
+      directory: C:\Workspaces
+    description: Clone this repository into C:\Workspaces
+    metadata: {}
+  - name: powershell
+    parameters:
+      command: Write-Host 'hello, world!'
+    description: print hello world
+    metadata: {}
+  - name: winget
+    parameters:
+      downloadUrl: >-
+        https://raw.githubusercontent.com/janegilring/devbox-definition-catalog/refs/heads/main/DevBox-Definitions/PSConfEU/jan_dsc.yaml
+      configurationFile: C:\WinGetConfig\jan.dsc.yaml
+    description: >-
+      Apply a WinGet configuration file, downloading from a public URL to the
+      specified path, running as the user
+    metadata: {}
