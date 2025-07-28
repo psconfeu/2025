@@ -86,7 +86,7 @@ function Write-Color {
     }
     process {
         if ($ForegroundColor -and $BackgroundColor) {
-            return $VT.Combo -f @(1
+            return $VT.Combo -f @(
                 $ForegroundColor.R,
                 $ForegroundColor.G,
                 $ForegroundColor.B,
