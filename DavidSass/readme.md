@@ -6,6 +6,8 @@ Are you struggling to justify yet another subscription at work while bored to de
 
 In this session, we’ll explore how to integrate Winget into PowerShell scripts and deliver them to your Windows devices using Intune’s remediation scripts feature. We’ll also cover techniques for gathering logs and other complex information, tasks that would otherwise require paid add-ons from the Intune Suite.
 
+[![Watch the video](https://img.youtube.com/vi/tfhU2-J47UA/hqdefault.jpg)](https://www.youtube.com/embed/tfhU2-J47UA)
+
 ## VS Code Extension Deployment with Intune
 
 The VS Code extension marketplace is a double-edged sword: it gives us countless extensions which make our lives a lot easier, but on the other hand it contains malicious extensions impersonating popular tools or just plain simple info stealers. This means there is a significant risk that these extensions can leak your developer credentials together with your source code, and as is stands today we lack a clear way to manage these risk.
@@ -19,5 +21,7 @@ In a purely Defender XDR based Security Operations Center, repetitive workflows 
 In this session, I’ll demonstrate how I used PowerShell Notebooks to develop tools that eliminated almost all of this browser based repetitive work, increased efficiency, and enhanced incident response. Expect live demos of tools in use, all designed to scale SOC capabilities without adding licensing costs.
 
 Prerequisite: Watch Execute Notebooks Everywhere from PSConfEU 2024. This session will arm you with actionable insights to improve your SOC’s performance and drive down costs.
+
+[![Watch the video](https://img.youtube.com/vi/cbUktoR8z8A/hqdefault.jpg)](https://www.youtube.com/embed/cbUktoR8z8A)
 
 ![Visitors](https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fgithub.com%2Fpsconfeu%2F2025%2FDavidSass%2Freadme.md&countColor=%23263759)
